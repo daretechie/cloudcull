@@ -56,12 +56,18 @@ uv init
 uv add boto3
 ```
 
-### 2. Run an Audit (Dry Run)
+### 2. Run a Demonstration (Simulated Mode)
+Run a full multi-cloud audit without needing cloud credentials or AI API keys. Perfect for testing and demonstrations:
+```bash
+uv run python main.py --simulated --dry-run
+```
+
+### 3. Run a Real Audit (Dry Run)
 ```bash
 uv run python main.py --region us-east-1 --dry-run
 ```
 
-### 3. Execution (The Kill-Switch)
+### 4. Execution (The Kill-Switch)
 ```bash
 uv run python main.py --region us-east-1 --no-dry-run
 ```
