@@ -8,25 +8,31 @@ import {
   CheckCircle2,
   Clock,
   Box,
-  Server
+  Server,
+  DollarSign,
+  TrendingUp
 } from 'lucide-react';
 import './App.css';
 
+// Relaxed variants to ensure visibility even if stagger fails
 const containerVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0 },
   visible: { 
-    opacity: 1, 
-    y: 0,
+    opacity: 1,
     transition: { 
-      duration: 0.6,
+      duration: 0.4,
       staggerChildren: 0.1
     }
   }
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1 }
+  hidden: { opacity: 0, y: 10 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.5 }
+  }
 };
 
 function App() {
@@ -54,18 +60,18 @@ function App() {
   if (loading) return (
     <div className="loading-screen">
       <motion.div 
-        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ repeat: Infinity, duration: 2 }}
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ repeat: Infinity, duration: 1.5 }}
       >
-        INITIALIZING CLOUDCULL PROTOCOL...
+        CLOUDCULL // INITIALIZING...
       </motion.div>
     </div>
   );
 
   if (!data) return (
     <div className="error-screen">
-      <AlertTriangle className="error-icon" />
-      NO AUDIT DATA DETECTED. EXECUTE SCAN.
+      <AlertTriangle size={48} />
+      <div>AUDIT DATA DISCONNECTED</div>
     </div>
   );
 
@@ -78,51 +84,45 @@ function App() {
         animate="visible"
       >
         <header className="dashboard-header">
-          <motion.img 
-            src={`${basePath}/logo.png`} 
-            alt="CloudCull Logo" 
-            className="brand-logo"
-            whileHover={{ rotate: 5, scale: 1.05 }}
-          />
-          <div className="header-status">
+          <motion.div className="logo-container" variants={itemVariants}>
+            <img src={`${basePath}/logo.png`} alt="CloudCull" className="brand-logo" />
+          </motion.div>
+          <motion.div className="header-status" variants={itemVariants}>
             <span className="status-dot"></span> 
-            <Activity size={14} className="pulse-icon" /> SYSTEM ONLINE
-          </div>
+            <Activity size={14} className="pulse-icon" /> SERVICE ACTIVE
+          </motion.div>
         </header>
 
         <section className="hero-stats">
           <motion.div className="hero-card savings-card" variants={itemVariants}>
-            <div className="hero-label"><Target size={14} /> POTENTIAL MONTHLY RECOVERY</div>
-            <motion.div 
-              className="hero-value glowing-text"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 100 }}
-            >
+            <div className="hero-label">
+              <DollarSign size={16} /> POTENTIAL MONTHLY RECOVERY
+            </div>
+            <div className="hero-value glowing-text">
               ${data.summary.total_monthly_savings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </motion.div>
+            </div>
           </motion.div>
         </section>
 
         <div className="secondary-stats">
-          <motion.div className="stat-item" variants={itemVariants} whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+          <motion.div className="stat-item" variants={itemVariants}>
             <span className="stat-label"><Box size={14} /> ZOMBIE NODES</span>
             <span className="stat-value text-zombie">{data.summary.zombie_count}</span>
           </motion.div>
-          <motion.div className="stat-item" variants={itemVariants} whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
-            <span className="stat-label"><Server size={14} /> CLOUDS SCANNED</span>
-            <span className="stat-value text-neon-blue">3</span>
+          <motion.div className="stat-item" variants={itemVariants}>
+            <span className="stat-label"><Server size={14} /> CLOUD PROBES</span>
+            <span className="stat-value text-neon-blue">Active</span>
           </motion.div>
-          <motion.div className="stat-item" variants={itemVariants} whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
-            <span className="stat-label"><Clock size={14} /> LAST AUDIT</span>
-            <span className="stat-value">{new Date(data.summary.timestamp).toLocaleTimeString()}</span>
+          <motion.div className="stat-item" variants={itemVariants}>
+            <span className="stat-label"><Clock size={14} /> LAST SCAN</span>
+            <span className="stat-value">{new Date(data.summary.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
           </motion.div>
         </div>
 
-        <section className="targets-section">
+        <motion.section className="targets-section" variants={itemVariants}>
           <div className="section-header">
-            <h3><Zap size={16} /> DETECTED ANOMALIES</h3>
-            <span className="anomaly-count">{data.instances.length} ACTIVE TARGETS</span>
+            <h3><Zap size={16} /> TARGET ANOMALIES</h3>
+            <span className="anomaly-count">{data.instances.length} NODES</span>
           </div>
           
           <div className="table-container">
@@ -133,7 +133,7 @@ function App() {
                   <th>TYPE</th>
                   <th>OWNER</th>
                   <th>WASTE / MO</th>
-                  <th>ACTION</th>
+                  <th>STATUS</th>
                 </tr>
               </thead>
               <tbody>
@@ -141,24 +141,20 @@ function App() {
                   {data.instances.map((inst, index) => (
                     <motion.tr 
                       key={inst.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      whileHover={{ backgroundColor: "rgba(255,255,255,0.02)", x: 5 }}
-                      className="table-row-interactive"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 + index * 0.05 }}
+                      whileHover={{ backgroundColor: "rgba(255,255,255,0.03)" }}
                     >
                       <td className="mono-font">{inst.id}</td>
                       <td>{inst.type}</td>
-                      <td>
-                        <span className="owner-tag">@{inst.owner}</span>
-                      </td>
-                      <td className="text-white font-semibold">
+                      <td><span className="owner-tag">@{inst.owner}</span></td>
+                      <td className="text-white font-bold">
                         ${(inst.rate * 24 * 30).toLocaleString()}
                       </td>
                       <td>
                         <span className={`status-badge-compact ${inst.status === 'ZOMBIE' ? 'badge-terminate' : 'badge-safe'}`}>
-                          {inst.status === 'ZOMBIE' ? <AlertTriangle size={12} /> : <CheckCircle2 size={12} />}
-                          {inst.status === 'ZOMBIE' ? 'CULL' : 'MONITOR'}
+                          {inst.status === 'ZOMBIE' ? 'ZOMBIE' : 'ACTIVE'}
                         </span>
                       </td>
                     </motion.tr>
@@ -167,7 +163,7 @@ function App() {
               </tbody>
             </table>
           </div>
-        </section>
+        </motion.section>
       </motion.div>
     </div>
   );
