@@ -128,25 +128,31 @@ function App() {
     <div className="app-container">
       <motion.div 
         className="glass-panel main-dashboard"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
         <header className="dashboard-header">
           <motion.div className="logo-container" whileHover={{ scale: 1.02 }}>
             <img src={`${basePath}/logo.png`} alt="CloudCull" className="brand-logo" />
           </motion.div>
-          <div className="header-status">
-            <span className="status-dot"></span> 
-            <Activity size={14} className="pulse-icon" /> SERVICE ACTIVE
+          
+          <div className="header-meta">
+            <div className="scan-timestamp">
+              <Clock size={12} /> LAST SCAN: {new Date(data.summary.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </div>
+            <div className="header-status">
+              <span className="status-dot"></span> 
+              <Activity size={14} className="pulse-icon" /> SERVICE ACTIVE
+            </div>
           </div>
         </header>
 
         <div className="executive-grid">
           <motion.div 
             className="hero-card main-hero"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
             <div className="hero-label">
@@ -161,8 +167,8 @@ function App() {
 
           <motion.div 
             className="hero-card stat-card"
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
             <div className="hero-label"><TrendingUp size={16} /> PERFORMANCE IMPACT</div>
@@ -193,8 +199,8 @@ function App() {
                   className="anomaly-card"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
+                  transition={{ delay: 0.4 + (index % 10) * 0.05 }}
+                  whileHover={{ scale: 1.02, borderColor: "var(--neon-blue)" }}
                 >
                   <div className="card-header">
                     <div className="platform-info">
@@ -215,7 +221,7 @@ function App() {
                           className="metric-bar-fill"
                           initial={{ width: 0 }}
                           animate={{ width: `${(inst.metrics.max_cpu / 100) * 100}%` }}
-                          transition={{ duration: 1, delay: 0.8 }}
+                          transition={{ duration: 1, delay: 0.6 }}
                         />
                       </div>
                     </div>
@@ -227,7 +233,7 @@ function App() {
                           style={{ backgroundColor: '#bd00ff' }}
                           initial={{ width: 0 }}
                           animate={{ width: `${Math.min(inst.metrics.network_in * 10, 100)}%` }}
-                          transition={{ duration: 1, delay: 0.9 }}
+                          transition={{ duration: 1, delay: 0.7 }}
                         />
                       </div>
                     </div>

@@ -26,9 +26,10 @@ body {
 
 .app-container {
   width: 100%;
-  padding: 2rem;
+  padding: 4rem 2rem;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .glass-panel {
@@ -41,15 +42,36 @@ body {
   padding: 3rem;
   width: 100%;
   max-width: 1200px;
+  margin: 0 auto;
 }
 
 .dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 3rem;
   border-bottom: 1px solid var(--glass-border);
   padding-bottom: 1.5rem;
+}
+
+.header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.scan-timestamp {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--glass-border);
 }
 
 .brand-logo {
@@ -61,10 +83,10 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   letter-spacing: 2px;
   color: var(--success);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .status-dot {
@@ -86,7 +108,7 @@ body {
 .hero-card {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 20px;
-  padding: 2rem;
+  padding: 2.5rem;
   border: 1px solid var(--glass-border);
   position: relative;
   overflow: hidden;
@@ -108,24 +130,26 @@ body {
 }
 
 .hero-label {
-  font-size: 0.75rem;
-  letter-spacing: 2px;
+  font-size: 0.7rem;
+  letter-spacing: 2.5px;
   color: var(--text-secondary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   text-transform: uppercase;
+  font-weight: 600;
 }
 
 .hero-value {
-  font-size: 3rem;
+  font-size: 3.25rem;
   font-weight: 800;
   font-family: 'JetBrains Mono', monospace;
   background: linear-gradient(135deg, var(--neon-blue), #fff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4));
+  letter-spacing: -2px;
 }
 
 .stat-card {
@@ -134,14 +158,14 @@ body {
 }
 
 .stat-card .hero-value {
-  font-size: 2rem;
+  font-size: 2.25rem;
 }
 
 /* Gauge Styles */
 .gauge-container {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 1rem;
+  width: 85px;
+  height: 85px;
+  margin-bottom: 1.25rem;
 }
 
 .gauge-svg {
@@ -166,63 +190,71 @@ body {
 .topology-container {
   margin-bottom: 4rem;
   padding: 2rem;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.25);
   border-radius: 20px;
   border: 1px solid var(--glass-border);
 }
 
 .topology-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   display: flex;
   align-items: center;
   gap: 1rem;
+  justify-content: center;
 }
 
 .topology-header h3 {
   margin: 0;
-  font-size: 1rem;
-  letter-spacing: 2px;
+  font-size: 0.85rem;
+  letter-spacing: 3px;
   color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .mermaid-wrapper {
   background: rgba(255, 255, 255, 0.01);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 1.5rem;
   display: flex;
   justify-content: center;
+  overflow-x: auto;
 }
 
 /* Instance Card Grid */
 .cards-section {
-  margin-top: 3rem;
+  margin-top: 4rem;
 }
 
 .section-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
+  padding: 0 0.5rem;
 }
 
 .section-title h2 {
-  font-size: 1.25rem;
-  letter-spacing: 2px;
+  font-size: 1.1rem;
+  letter-spacing: 3px;
   margin: 0;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .anomaly-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.5rem;
 }
 
 .anomaly-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  padding: 1.5rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 18px;
+  padding: 1.75rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   cursor: crosshair;
 }
@@ -230,25 +262,28 @@ body {
 .anomaly-card:hover {
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--neon-blue);
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px -10px rgba(0, 242, 254, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px -20px rgba(0, 242, 254, 0.4);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .platform-badge {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 800;
-  letter-spacing: 1px;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  letter-spacing: 1.5px;
+  padding: 0.25rem 0.6rem;
+  border-radius: 5px;
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  display: inline-block;
 }
 
 .aws-badge { background: #FF9900; }
@@ -257,21 +292,22 @@ body {
 
 .card-id {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-primary);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
   display: block;
 }
 
 .card-type {
   font-size: 0.75rem;
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .card-metrics {
-  margin: 1.5rem 0;
+  margin: 2rem 0;
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .metric-item {
@@ -282,21 +318,23 @@ body {
   font-size: 0.65rem;
   color: var(--text-secondary);
   display: block;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .metric-bar-bg {
-  height: 4px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 2px;
+  height: 5px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .metric-bar-fill {
   height: 100%;
   background: var(--neon-blue);
-  border-radius: 2px;
-  transition: width 1s ease-out;
+  border-radius: 3px;
+  box-shadow: 0 0 10px var(--neon-blue);
 }
 
 .card-footer {
@@ -304,19 +342,21 @@ body {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--glass-border);
-  padding-top: 1rem;
+  padding-top: 1.25rem;
 }
 
 .waste-amount {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: var(--danger);
   font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 10px rgba(255, 42, 109, 0.3);
 }
 
 .owner-tag {
   font-size: 0.7rem;
   color: var(--text-secondary);
+  font-weight: 600;
 }
 
 /* Animations */
@@ -336,9 +376,9 @@ body {
 
 .pulse-text {
   font-weight: 800;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   color: var(--neon-blue);
-  text-shadow: 0 0 10px var(--neon-blue);
+  text-shadow: 0 0 15px var(--neon-blue);
 }
 
 .error-screen {
@@ -348,11 +388,15 @@ body {
   justify-content: center;
   align-items: center;
   color: var(--danger);
+  gap: 2rem;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
   .executive-grid {
     grid-template-columns: 1fr;
+  }
+  .app-container {
+    padding: 2rem 1rem;
   }
 }
