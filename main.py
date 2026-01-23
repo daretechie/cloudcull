@@ -18,7 +18,7 @@ logger = logging.getLogger("CloudCull")
 class CloudCullRunner:
     def __init__(self, region: str = "us-east-1", dry_run: bool = True, model: str = "claude", simulated: bool = False):
         self.dry_run = dry_run
-        self.aws = AWSAdapter(region=region)
+        self.aws = AWSAdapter(region=region, simulated=simulated)
         
         # Multi-Cloud Adapters
         from adapters.azure import AzureAdapter

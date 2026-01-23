@@ -6,12 +6,19 @@ from typing import List, Dict
 logger = logging.getLogger("CloudCull.AWS")
 
 class AWSAdapter:
-    def __init__(self, region: str = "us-east-1"):
+    def __init__(self, region: str = "us-east-1", simulated: bool = False):
         self.region = region
-        self.ec2 = boto3.client("ec2", region_name=region)
-        self.cw = boto3.client("cloudwatch", region_name=region)
-        self.cloudtrail = boto3.client("cloudtrail", region_name=region)
+        self.simulated = simulated
         self.gpu_types = ["p3", "p4", "g4", "g5", "p5"]
+        
+        if not self.simulated:
+            try:
+                self.ec2 = boto3.client("ec2", region_name=region)
+                self.cw = boto3.client("cloudwatch", region_name=region)
+                self.cloudtrail = boto3.client("cloudtrail", region_name=region)
+            except Exception as e:
+                logger.error("AWS Authentication Failed: %s. Falling back to simulated mode.", e)
+                self.simulated = True
 
     def get_metrics(self, instance_id: str, minutes: int = 60) -> Dict[str, float]:
         """Precision Metric Probing: CPU + NetworkIn."""
@@ -62,6 +69,18 @@ class AWSAdapter:
 
     def scan(self) -> List[Dict]:
         logger.info("Probing AWS [%s] for GPU waste...", self.region)
+        
+        if self.simulated:
+            logger.info("Running AWS in MOCK mode (No Credentials found/provided).")
+            return [{
+                "platform": "AWS",
+                "id": "i-0a1b2c3d4e5f6g7h8",
+                "type": "p4d.24xlarge",
+                "metrics": {"max_cpu": 0.2, "network_in": 0.05},
+                "owner": "research_lead",
+                "metadata": {"InstanceId": "i-0a1b2c3d4e5f6g7h8", "InstanceType": "p4d.24xlarge"}
+            }]
+
         filters = [{'Name': 'instance-state-name', 'Values': ['running']}]
         response = self.ec2.describe_instances(Filters=filters)
         
