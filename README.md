@@ -48,6 +48,9 @@ graph LR
 
 ## 🛠️ Usage
 
+> [!NOTE]
+> **CloudCull is a CLI-First Tool.** The dashboard is a passive visualization layer. To audit or terminate resources, you must use the terminal commands below.
+
 ### 1. Installation
 ```bash
 git clone https://github.com/daretechie/cloudcull.git
