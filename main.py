@@ -122,6 +122,7 @@ def main():
     parser.add_argument("--no-dry-run", action="store_false", dest="dry_run", help="Enable production kill-switch")
     parser.add_argument("--simulated", action="store_true", help="Run in mock mode without cloud credentials")
     parser.add_argument("--model", default="claude", choices=["claude", "gemini", "llama"], help="AI Model for analysis")
+    parser.add_argument("--active-ops", action="store_true", help="Generate and execute remediation bundle")
     parser.add_argument("--output", help="Path to save JSON report")
     
     args = parser.parse_args()
@@ -133,6 +134,25 @@ def main():
         simulated=args.simulated
     )
     results = runner.run_audit()
+
+    # Phase 15: Hard-Core IaC Artifacts
+    if any(r['status'] == "ZOMBIE" for r in results):
+        plan = runner.remediator.generate_plan([r for r in results if r['status'] == "ZOMBIE"])
+        runner.remediator.save_manifest(plan)
+        bundle_path = runner.remediator.generate_remediation_bundle(plan)
+        
+        if args.active_ops:
+            import subprocess
+            logger.info("📡 ACTIVEOPS TRIGGERED: Executing Remediation Bundle...")
+            confirm = input(f"CRITICAL: Execute automated remediation for {len(plan['resources'])} targets? [y/N]: ")
+            if confirm.lower() == 'y':
+                try:
+                    subprocess.run(["bash", bundle_path], check=True)
+                    logger.info("🛡️  ACTIVEOPS COMPLETE. Infrastructure reconciled.")
+                except subprocess.CalledProcessError as e:
+                    logger.error("❌ ACTIVEOPS FAILED: %s", e)
+            else:
+                logger.info("❌ ActiveOps aborted by operator.")
 
     if args.output:
         import json

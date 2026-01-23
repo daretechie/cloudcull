@@ -43,6 +43,34 @@ class TerraformRemediator:
             
         return plan
 
+    def generate_remediation_bundle(self, plan: Dict, output_path: str = "remediation.sh"):
+        """Generates an executable shell script for rapid manual culling."""
+        logger.info("Generating Executable Remediation Bundle: %s", output_path)
+        
+        with open(output_path, "w", encoding='utf-8') as f:
+            f.write("#!/bin/bash\n")
+            f.write("# CloudCull: Autonomous Remediation Bundle\n")
+            f.write(f"# Generated at: {plan['timestamp']}\n\n")
+            f.write("echo '⚠️  CRITICAL: Starting CloudCull ActiveOps Remediation...'\n\n")
+            
+            for r in plan['resources']:
+                f.write(f"echo 'Sniping {r['platform']} {r['id']} ({r['owner']})...'\n")
+                f.write(f"{r['suggested_iac_action']}\n")
+            
+            f.write("\necho '✅ Remediation Complete. Infrastructure hardened.'\n")
+        
+        import os
+        os.chmod(output_path, 0o755)
+        return output_path
+
+    def save_manifest(self, plan: Dict, output_path: str = "remediation_manifest.json"):
+        """Saves a structured manifest for CI/CD consumption."""
+        import json
+        with open(output_path, "w", encoding='utf-8') as f:
+            json.dump(plan, f, indent=2)
+        logger.info("Remediation Manifest saved to %s", output_path)
+        return output_path
+
 def execute_local_cull(adapter: Any, instance_id: str):
     """Direct execution wrapper."""
     adapter.stop_instance(instance_id)
