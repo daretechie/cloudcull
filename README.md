@@ -65,10 +65,14 @@ uv sync
 uv run python main.py --simulated --dry-run
 ```
 
-### 3. Execution
+### 3. Execution (ActiveOps)
+To run a real-world audit and trigger the automated remediation bundle:
 ```bash
-uv run python main.py --region us-east-1 --no-dry-run
+uv run python main.py --region us-east-1 --active-ops
 ```
+
+> [!CAUTION]
+> `--active-ops` will generate `remediation.sh` and prompt for execution. Use with high-stakes environments after dry-run verification.
 
 ---
 

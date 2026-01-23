@@ -55,4 +55,8 @@ graph TD
 
 ### 4. Remediation Engine
 - **Philosophy**: "GitOps First". We prefer generating `terraform state rm` commands over destructive API calls.
+- **ActiveOps Artifacts**:
+    - `remediation.sh`: An executable shell script for manual or orchestrated culling.
+    - `remediation_manifest.json`: A structured manifest for CI/CD integration.
 - **Kill-Switch**: A `--no-dry-run` flag exists for emergency cost control, executing direct API termination.
+- **Orchestration**: The `--active-ops` flag triggers automated execution of the remediation artifacts.

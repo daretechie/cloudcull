@@ -31,7 +31,14 @@ The "Sniper Console" allows for precision manual remediation:
 3.  **Snip**: Click the "Copy Kill Command" icon. This copies the exact `terraform state rm` or CLI command for that specific instance.
 4.  **Execute**: Paste the command into your terminal to safely remove the resource from your state and infrastructure.
 
-### S4: Emergency Kill-Switch (CLI)
+### S4: ActiveOps (Automated Remediation)
+For high-speed, autonomous governance:
+1.  **Generate**: Run `uv run python main.py --active-ops`.
+2.  **Verify**: CloudCull will generate `remediation.sh` and `remediation_manifest.json`.
+3.  **Approve**: The CLI will prompt for a final confirmation before executing the generated bundle.
+4.  **Audit**: Review the `remediation_manifest.json` for a post-mortem of all actions taken.
+
+### S5: Emergency Kill-Switch (CLI)
 To verify the kill-switch works without cost:
 1.  Run locally with `--dry-run`.
 2.  Verify the logs show "Executing Kill-Switch".
