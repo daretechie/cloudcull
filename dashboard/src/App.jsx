@@ -20,47 +20,130 @@ function App() {
       });
   }, []);
 
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Zap, 
+  Target, 
+  Activity, 
+  ExternalLink, 
+  AlertTriangle, 
+  CheckCircle2,
+  Clock,
+  Box,
+  Server
+} from 'lucide-react';
+
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { 
+      duration: 0.6,
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1 }
+};
+
+function App() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const reportPath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/report.json`;
+    fetch(reportPath)
+      .then(res => res.json())
+      .then(d => {
+        setData(d);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load audit report:", err);
+        setLoading(false);
+      });
+  }, []);
+
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
-  if (loading) return <div className="loading-screen">INITIALIZING CLOUDCULL PROTOCOL...</div>;
-  if (!data) return <div className="error-screen">NO AUDIT DATA DETECTED. EXECUTE SCAN.</div>;
+  if (loading) return (
+    <div className="loading-screen">
+      <motion.div 
+        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
+        transition={{ repeat: Infinity, duration: 2 }}
+      >
+        INITIALIZING CLOUDCULL PROTOCOL...
+      </motion.div>
+    </div>
+  );
+
+  if (!data) return (
+    <div className="error-screen">
+      <AlertTriangle className="error-icon" />
+      NO AUDIT DATA DETECTED. EXECUTE SCAN.
+    </div>
+  );
 
   return (
     <div className="app-container">
-      <div className="glass-panel main-dashboard">
+      <motion.div 
+        className="glass-panel main-dashboard"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         <header className="dashboard-header">
-          <img src={`${basePath}/logo.png`} alt="CloudCull Logo" className="brand-logo" />
+          <motion.img 
+            src={`${basePath}/logo.png`} 
+            alt="CloudCull Logo" 
+            className="brand-logo"
+            whileHover={{ rotate: 5, scale: 1.05 }}
+          />
           <div className="header-status">
-            <span className="status-dot"></span> SYSTEM ONLINE
+            <span className="status-dot"></span> 
+            <Activity size={14} className="pulse-icon" /> SYSTEM ONLINE
           </div>
         </header>
 
         <section className="hero-stats">
-          <div className="hero-card savings-card">
-            <div className="hero-label">POTENTIAL MONTHLY RECOVERY</div>
-            <div className="hero-value glowing-text">
+          <motion.div className="hero-card savings-card" variants={itemVariants}>
+            <div className="hero-label"><Target size={14} inline /> POTENTIAL MONTHLY RECOVERY</div>
+            <motion.div 
+              className="hero-value glowing-text"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 100 }}
+            >
               ${data.summary.total_monthly_savings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
 
         <div className="secondary-stats">
-          <div className="stat-item">
-            <span className="stat-label">ZOMBIE NODES</span>
+          <motion.div className="stat-item" variants={itemVariants} whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+            <span className="stat-label"><Box size={14} /> ZOMBIE NODES</span>
             <span className="stat-value text-zombie">{data.summary.zombie_count}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">CLOUDS SCANNED</span>
-            <span className="stat-value">3</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">LAST SCAN</span>
+          </motion.div>
+          <motion.div className="stat-item" variants={itemVariants} whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+            <span className="stat-label"><Server size={14} /> CLOUDS SCANNED</span>
+            <span className="stat-value text-neon-blue">3</span>
+          </motion.div>
+          <motion.div className="stat-item" variants={itemVariants} whileHover={{ backgroundColor: "rgba(255,255,255,0.05)" }}>
+            <span className="stat-label"><Clock size={14} /> LAST AUDIT</span>
             <span className="stat-value">{new Date(data.summary.timestamp).toLocaleTimeString()}</span>
-          </div>
+          </motion.div>
         </div>
 
         <section className="targets-section">
-          <h3>DETECTED ANOMALIES</h3>
+          <div className="section-header">
+            <h3><Zap size={16} /> DETECTED ANOMALIES</h3>
+            <span className="anomaly-count">{data.instances.length} ACTIVE TARGETS</span>
+          </div>
+          
           <div className="table-container">
             <table className="glass-table">
               <thead>
@@ -73,19 +156,33 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {data.instances.map(inst => (
-                  <tr key={inst.id}>
-                    <td className="mono-font">{inst.id}</td>
-                    <td>{inst.type}</td>
-                    <td>@{inst.owner}</td>
-                    <td className="text-white">${(inst.rate * 24 * 30).toLocaleString()}</td>
-                    <td>
-                      <span className={`status-badge ${inst.status === 'ZOMBIE' ? 'badge-terminate' : 'badge-safe'}`}>
-                        {inst.status === 'ZOMBIE' ? 'TERMINATE' : 'MONITOR'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                <AnimatePresence>
+                  {data.instances.map((inst, index) => (
+                    <motion.tr 
+                      key={inst.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ backgroundColor: "rgba(255,255,255,0.02)", x: 5 }}
+                      className="table-row-interactive"
+                    >
+                      <td className="mono-font">{inst.id}</td>
+                      <td>{inst.type}</td>
+                      <td>
+                        <span className="owner-tag">@{inst.owner}</span>
+                      </td>
+                      <td className="text-white font-semibold">
+                        ${(inst.rate * 24 * 30).toLocaleString()}
+                      </td>
+                      <td>
+                        <span className={`status-badge-compact ${inst.status === 'ZOMBIE' ? 'badge-terminate' : 'badge-safe'}`}>
+                          {inst.status === 'ZOMBIE' ? <AlertTriangle size={12} /> : <CheckCircle2 size={12} />}
+                          {inst.status === 'ZOMBIE' ? 'CULL' : 'MONITOR'}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               </tbody>
             </table>
           </div>
