@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Zap, 
   Target, 
@@ -18,7 +19,6 @@ function App() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    console.log("App mounted. Fetching report...");
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
     const reportPath = `${basePath}/report.json`;
     
@@ -28,7 +28,6 @@ function App() {
         return res.json();
       })
       .then(d => {
-        console.log("Data loaded successfully:", d);
         setData(d);
         setLoading(false);
       })
@@ -43,24 +42,38 @@ function App() {
 
   if (loading) return (
     <div className="loading-screen">
-      <div className="pulse-text">CLOUDCULL // INITIALIZING...</div>
+      <motion.div 
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ repeat: Infinity, duration: 1.5 }}
+        className="pulse-text"
+      >
+        CLOUDCULL // INITIALIZING...
+      </motion.div>
     </div>
   );
 
   if (error || !data) return (
     <div className="error-screen">
       <AlertTriangle size={48} />
-      <div>AUDIT DATA DISCONNECTED: {error || "No data"}</div>
+      <div style={{ marginTop: '1rem' }}>AUDIT DATA DISCONNECTED: {error || "No data"}</div>
     </div>
   );
 
   return (
     <div className="app-container">
-      <div className="glass-panel main-dashboard">
+      <motion.div 
+        className="glass-panel main-dashboard"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         <header className="dashboard-header">
-          <div className="logo-container">
+          <motion.div 
+            className="logo-container"
+            whileHover={{ scale: 1.02 }}
+          >
             <img src={`${basePath}/logo.png`} alt="CloudCull" className="brand-logo" />
-          </div>
+          </motion.div>
           <div className="header-status">
             <span className="status-dot"></span> 
             <Activity size={14} className="pulse-icon" /> SERVICE ACTIVE
@@ -68,31 +81,51 @@ function App() {
         </header>
 
         <section className="hero-stats">
-          <div className="hero-card savings-card">
+          <motion.div 
+            className="hero-card savings-card"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+          >
             <div className="hero-label">
               <DollarSign size={16} /> POTENTIAL MONTHLY RECOVERY
             </div>
             <div className="hero-value glowing-text">
               ${data.summary.total_monthly_savings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </div>
-          </div>
+          </motion.div>
         </section>
 
         <div className="secondary-stats">
-          <div className="stat-item">
+          <motion.div 
+            className="stat-item"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <span className="stat-label"><Box size={14} /> ZOMBIE NODES</span>
             <span className="stat-value text-zombie">{data.summary.zombie_count}</span>
-          </div>
-          <div className="stat-item">
+          </motion.div>
+          <motion.div 
+            className="stat-item"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             <span className="stat-label"><Server size={14} /> CLOUD PROBES</span>
             <span className="stat-value text-neon-blue">Active</span>
-          </div>
-          <div className="stat-item">
+          </motion.div>
+          <motion.div 
+            className="stat-item"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
             <span className="stat-label"><Clock size={14} /> LAST SCAN</span>
             <span className="stat-value">
               {new Date(data.summary.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
-          </div>
+          </motion.div>
         </div>
 
         <section className="targets-section">
@@ -113,26 +146,35 @@ function App() {
                 </tr>
               </thead>
               <tbody>
-                {data.instances.map((inst, index) => (
-                  <tr key={inst.id} className="table-row-static">
-                    <td className="mono-font">{inst.id}</td>
-                    <td>{inst.type}</td>
-                    <td><span className="owner-tag">@{inst.owner}</span></td>
-                    <td className="text-white font-bold">
-                      ${(inst.rate * 24 * 30).toLocaleString()}
-                    </td>
-                    <td>
-                      <span className={`status-badge-compact ${inst.status === 'ZOMBIE' ? 'badge-terminate' : 'badge-safe'}`}>
-                        {inst.status === 'ZOMBIE' ? 'CULL' : 'SAFE'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                <AnimatePresence>
+                  {data.instances.map((inst, index) => (
+                    <motion.tr 
+                      key={inst.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + index * 0.05 }}
+                      whileHover={{ backgroundColor: "rgba(255,255,255,0.03)", x: 2 }}
+                      className="table-row-interactive"
+                    >
+                      <td className="mono-font">{inst.id}</td>
+                      <td>{inst.type}</td>
+                      <td><span className="owner-tag">@{inst.owner}</span></td>
+                      <td className="text-white font-bold">
+                        ${(inst.rate * 24 * 30).toLocaleString()}
+                      </td>
+                      <td>
+                        <span className={`status-badge-compact ${inst.status === 'ZOMBIE' ? 'badge-terminate' : 'badge-safe'}`}>
+                          {inst.status === 'ZOMBIE' ? 'CULL' : 'SAFE'}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               </tbody>
             </table>
           </div>
         </section>
-      </div>
+      </motion.div>
     </div>
   );
 }
