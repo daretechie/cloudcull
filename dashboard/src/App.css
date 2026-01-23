@@ -15,6 +15,7 @@
 
 body {
   margin: 0;
+  padding: 0;
   background-color: var(--bg-deep);
   background-image: 
     radial-gradient(circle at 10% 20%, rgba(189, 0, 255, 0.15) 0%, transparent 40%),
@@ -22,92 +23,96 @@ body {
   color: var(--text-primary);
   font-family: 'Outfit', sans-serif;
   min-height: 100vh;
+  display: flex;
+  justify-content: center; /* Horizontal centering for child app-container */
 }
 
 .app-container {
   width: 100%;
+  max-width: 1400px;
   padding: 4rem 2rem;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  justify-content: center; /* Center the glass-panel child */
 }
 
 .glass-panel {
   background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border: 1px solid var(--glass-border);
   border-radius: 24px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  padding: 3rem;
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
+  padding: 3.5rem;
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 0 auto; /* Explicit auto-margin for backup */
+  position: relative;
 }
 
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
   border-bottom: 1px solid var(--glass-border);
-  padding-bottom: 1.5rem;
+  padding-bottom: 2rem;
 }
 
 .header-meta {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .scan-timestamp {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
-  letter-spacing: 1.5px;
+  letter-spacing: 2px;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.03);
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
   border: 1px solid var(--glass-border);
+  font-weight: 600;
 }
 
 .brand-logo {
-  height: 50px;
-  filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.3));
+  height: 55px;
+  filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4));
 }
 
 .header-status {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.7rem;
-  letter-spacing: 2px;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
   color: var(--success);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background: var(--success);
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--success);
+  box-shadow: 0 0 15px var(--success);
   animation: pulse 2s infinite;
 }
 
 .executive-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 3rem;
+  gap: 2rem;
+  margin-bottom: 4rem;
 }
 
 .hero-card {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 24px;
   padding: 2.5rem;
   border: 1px solid var(--glass-border);
   position: relative;
@@ -116,56 +121,49 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  transition: border-color 0.3s ease;
 }
 
-.hero-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
-  pointer-events: none;
+.hero-card:hover {
+  border-color: rgba(0, 242, 254, 0.3);
 }
 
 .hero-label {
   font-size: 0.7rem;
-  letter-spacing: 2.5px;
+  letter-spacing: 3px;
   color: var(--text-secondary);
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .hero-value {
-  font-size: 3.25rem;
+  font-size: 3.5rem;
   font-weight: 800;
   font-family: 'JetBrains Mono', monospace;
-  background: linear-gradient(135deg, var(--neon-blue), #fff);
+  background: linear-gradient(135deg, var(--neon-blue), #ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4));
+  filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.5));
   letter-spacing: -2px;
 }
 
 .stat-card {
-  padding: 1.5rem;
+  padding: 2rem;
   background: rgba(255, 255, 255, 0.02);
 }
 
 .stat-card .hero-value {
-  font-size: 2.25rem;
+  font-size: 2.5rem;
 }
 
-/* Gauge Styles */
 .gauge-container {
-  width: 85px;
-  height: 85px;
-  margin-bottom: 1.25rem;
+  width: 90px;
+  height: 90px;
+  margin-bottom: 1.5rem;
 }
 
 .gauge-svg {
@@ -183,106 +181,104 @@ body {
   stroke: var(--neon-blue);
   stroke-width: 8;
   stroke-linecap: round;
-  transition: stroke-dasharray 1s ease-out;
+  transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Topology Selection */
 .topology-container {
-  margin-bottom: 4rem;
-  padding: 2rem;
-  background: rgba(0,0,0,0.25);
-  border-radius: 20px;
+  margin-bottom: 5rem;
+  padding: 3rem;
+  background: rgba(0,0,0,0.3);
+  border-radius: 28px;
   border: 1px solid var(--glass-border);
 }
 
 .topology-header {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   justify-content: center;
 }
 
 .topology-header h3 {
   margin: 0;
-  font-size: 0.85rem;
-  letter-spacing: 3px;
+  font-size: 0.9rem;
+  letter-spacing: 4px;
   color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .mermaid-wrapper {
   background: rgba(255, 255, 255, 0.01);
-  border-radius: 12px;
-  padding: 1.5rem;
+  border-radius: 16px;
+  padding: 2rem;
   display: flex;
   justify-content: center;
   overflow-x: auto;
 }
 
-/* Instance Card Grid */
 .cards-section {
-  margin-top: 4rem;
+  margin-top: 5rem;
 }
 
 .section-title {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
-  padding: 0 0.5rem;
+  margin-bottom: 3rem;
+  padding: 0 1rem;
 }
 
 .section-title h2 {
-  font-size: 1.1rem;
-  letter-spacing: 3px;
+  font-size: 1.2rem;
+  letter-spacing: 4px;
   margin: 0;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .anomaly-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 2rem;
 }
 
 .anomaly-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--glass-border);
-  border-radius: 18px;
-  padding: 1.75rem;
+  border-radius: 20px;
+  padding: 2rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   cursor: crosshair;
 }
 
 .anomaly-card:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   border-color: var(--neon-blue);
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px -20px rgba(0, 242, 254, 0.4);
+  transform: translateY(-10px);
+  box-shadow: 0 30px 60px -20px rgba(0, 242, 254, 0.4);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .platform-badge {
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  padding: 0.25rem 0.6rem;
-  border-radius: 5px;
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   text-transform: uppercase;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   display: inline-block;
 }
 
@@ -292,22 +288,22 @@ body {
 
 .card-id {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-primary);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
 .card-type {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .card-metrics {
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   display: flex;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 .metric-item {
@@ -315,26 +311,26 @@ body {
 }
 
 .metric-label {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  letter-spacing: 1px;
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
 }
 
 .metric-bar-bg {
-  height: 5px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 3px;
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .metric-bar-fill {
   height: 100%;
   background: var(--neon-blue);
-  border-radius: 3px;
-  box-shadow: 0 0 10px var(--neon-blue);
+  border-radius: 4px;
+  box-shadow: 0 0 15px var(--neon-blue);
 }
 
 .card-footer {
@@ -342,24 +338,23 @@ body {
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--glass-border);
-  padding-top: 1.25rem;
+  padding-top: 1.5rem;
 }
 
 .waste-amount {
-  font-size: 1.35rem;
-  font-weight: 800;
+  font-size: 1.5rem;
+  font-weight: 900;
   color: var(--danger);
   font-family: 'JetBrains Mono', monospace;
-  text-shadow: 0 0 10px rgba(255, 42, 109, 0.3);
+  text-shadow: 0 0 15px rgba(255, 42, 109, 0.4);
 }
 
 .owner-tag {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
-/* Animations */
 @keyframes pulse {
   0% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.1); opacity: 0.8; }
@@ -375,10 +370,10 @@ body {
 }
 
 .pulse-text {
-  font-weight: 800;
-  letter-spacing: 6px;
+  font-weight: 900;
+  letter-spacing: 8px;
   color: var(--neon-blue);
-  text-shadow: 0 0 15px var(--neon-blue);
+  text-shadow: 0 0 20px var(--neon-blue);
 }
 
 .error-screen {
@@ -388,10 +383,9 @@ body {
   justify-content: center;
   align-items: center;
   color: var(--danger);
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .executive-grid {
     grid-template-columns: 1fr;
