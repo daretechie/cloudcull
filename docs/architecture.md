@@ -27,9 +27,12 @@ graph TD
         JSON -- "ZOMBIE" --> KillSwitch[API Kill-Switch (Optional)]
     end
     
-    subgraph "Layer 4: Visibility (Dashboard)"
+    subgraph "Layer 4: Visibility (Sniper Console)"
         Orchestrator -->|Output| Report[report.json]
         Report -->|Build| Vite[Vite + React Dashboard]
+        Vite -->|Feature| AI[AI Reasoning Callouts]
+        Vite -->|Feature| Log[Live Sniper Log Terminal]
+        Vite -->|Feature| Snip[One-Tap Kill Actions]
         Vite -->|Deploy| Pages[GitHub Pages]
     end
 ```

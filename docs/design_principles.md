@@ -26,3 +26,8 @@ CloudCull is built on specific architectural decisions that differentiate it fro
 *   **Privacy:** Use a locally hosted Llama via Groq.
 *   **Cost:** Use Gemini Flash for high-volume scanning.
 *   **Smarts:** Use Claude or GPT-4o for complex reasoning.
+
+## 6. Visibility as a Catalyst for Action
+**Rationale:** Dashboards that only show "Potential Savings" often lead to analysis paralysis.
+*   **The Sniper Console:** We transform the dashboard into a "Sniper Console" by providing **AI Reasoning Callouts** and **One-Tap Snip** controls. 
+*   **Result:** By showing exactly *why* an instance is a zombie and providing the *exact command* to kill it, we remove the friction between detection and remediation.

@@ -24,7 +24,14 @@ To run a real multi-cloud audit, add these to **Settings > Secrets and variables
 1.  Go to **Settings > Pages**.
 2.  Ensure **Source** is set to **GitHub Actions**.
 
-### S3: Emergency Kill-Switch
+### S3: Dashboard Remediation Workflow
+The "Sniper Console" allows for precision manual remediation:
+1.  **Analyze**: Review the "Sniper Reasoning" on each card to understand the AI's decision.
+2.  **Verify**: Check the metrics (CPU/Network) and owner attribution.
+3.  **Snip**: Click the "Copy Kill Command" icon. This copies the exact `terraform state rm` or CLI command for that specific instance.
+4.  **Execute**: Paste the command into your terminal to safely remove the resource from your state and infrastructure.
+
+### S4: Emergency Kill-Switch (CLI)
 To verify the kill-switch works without cost:
 1.  Run locally with `--dry-run`.
 2.  Verify the logs show "Executing Kill-Switch".

@@ -41,11 +41,10 @@ graph LR
 
 ## 🏗️ Key Features
 
-*   **🧟 Multi-Cloud Sniper:** Native support for AWS EC2, Azure VMs, and GCP Compute Engine.
+*   **� High-Fidelity Brain:** Pluggable AI (Claude 3.5, Gemini 1.5, Llama 3) for intelligent classification.
+*   **📡 Sniper Console:** A technical Vite + React dashboard with **AI Reasoning Callouts**, **Live Terminal Logs**, and **One-Tap Kill Actions**.
 *   **👤 Identity Layer:** Finds exactly who launched the instance for high-stakes accountability.
 *   **🛠️ IaC-Driven Remediation:** Generates `terraform state rm` plans instead of raw, risky deletions.
-*   **🧠 Brain (LLMAdapter):** Pluggable AI (Claude 3.5, Gemini 1.5, Llama 3) for intelligent classification.
-*   **📊 Animated Dashboard:** A high-fidelity Vite + React dashboard with real-time motion forensics.
 
 ---
 
