@@ -6,7 +6,9 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/report.json')
+    // Dynamically handle GitHub Pages base path
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+    fetch(`${basePath}/report.json`)
       .then(res => res.json())
       .then(json => {
         setData(json);
