@@ -56,6 +56,7 @@ class CloudCullRunner:
             decision = llm_report.recommendation.decision
             
             t['status'] = decision
+            t['reasoning'] = llm_report.recommendation.reasoning  # Enrich for dashboard
             t['rate'] = self.pricing.get_hourly_rate(t['platform'], t['type'])
             
             monthly = t['rate'] * 24 * 30
@@ -81,6 +82,12 @@ class CloudCullRunner:
         # 3. Remediation & IaC Generation
         if zombies:
             iac_plan = self.remediator.generate_plan(zombies)
+            
+            # Map IaC actions back to all_results for the dashboard
+            action_map = {r['id']: r['suggested_iac_action'] for r in iac_plan['resources']}
+            for r in all_results:
+                if r['id'] in action_map:
+                    r['iac_command'] = action_map[r['id']]
             
             if self.dry_run:
                 logger.info("Dry-run: Generating IaC Remediation Plan (Simulation)...")

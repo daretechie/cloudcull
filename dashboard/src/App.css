@@ -11,6 +11,7 @@
   --danger: #ff2a6d;
   --success: #05f874;
   --warning: #f7b731;
+  --terminal-bg: rgba(5, 5, 17, 0.95);
 }
 
 body {
@@ -24,15 +25,15 @@ body {
   font-family: 'Outfit', sans-serif;
   min-height: 100vh;
   display: flex;
-  justify-content: center; /* Horizontal centering for child app-container */
+  justify-content: center;
 }
 
 .app-container {
   width: 100%;
   max-width: 1400px;
-  padding: 4rem 2rem;
+  padding: 4rem 2rem 10rem 2rem; /* Extra padding for terminal */
   display: flex;
-  justify-content: center; /* Center the glass-panel child */
+  justify-content: center;
 }
 
 .glass-panel {
@@ -45,7 +46,7 @@ body {
   padding: 3.5rem;
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto; /* Explicit auto-margin for backup */
+  margin: 0 auto;
   position: relative;
 }
 
@@ -146,6 +147,7 @@ body {
   font-family: 'JetBrains Mono', monospace;
   background: linear-gradient(135deg, var(--neon-blue), #ffffff);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.5));
   letter-spacing: -2px;
@@ -252,7 +254,8 @@ body {
   padding: 2rem;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
-  cursor: crosshair;
+  display: flex;
+  flex-direction: column;
 }
 
 .anomaly-card:hover {
@@ -300,8 +303,19 @@ body {
   font-weight: 600;
 }
 
+.sniper-reasoning {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(189, 0, 255, 0.05);
+  border-left: 2px solid var(--neon-purple);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
 .card-metrics {
-  margin: 2.5rem 0;
+  margin: 1.5rem 0;
   display: flex;
   gap: 1.5rem;
 }
@@ -339,6 +353,7 @@ body {
   align-items: center;
   border-top: 1px solid var(--glass-border);
   padding-top: 1.5rem;
+  margin-top: auto;
 }
 
 .waste-amount {
@@ -349,10 +364,104 @@ body {
   text-shadow: 0 0 15px rgba(255, 42, 109, 0.4);
 }
 
+.snip-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.snip-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.snip-button:hover {
+  background: var(--neon-blue);
+  color: var(--bg-deep);
+  border-color: var(--neon-blue);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--neon-blue);
+}
+
 .owner-tag {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
   font-weight: 700;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Sniper Log Terminal */
+.sniper-log {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1200px;
+  background: var(--terminal-bg);
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  backdrop-filter: blur(20px);
+  z-index: 1000;
+  transition: height 0.3s ease;
+  overflow: hidden;
+}
+
+.terminal-header {
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.terminal-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--neon-blue);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.terminal-body {
+  height: 200px;
+  padding: 1.5rem;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #a5b4fc;
+  line-height: 1.6;
+}
+
+.log-line {
+  margin-bottom: 0.4rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.log-time { color: var(--text-secondary); }
+.log-tag { color: var(--neon-blue); font-weight: 700; }
+
+.terminal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 3px;
 }
 
 @keyframes pulse {
@@ -391,6 +500,9 @@ body {
     grid-template-columns: 1fr;
   }
   .app-container {
-    padding: 2rem 1rem;
+    padding: 2rem 1rem 8rem 1rem;
+  }
+  .sniper-log {
+    width: 95%;
   }
 }

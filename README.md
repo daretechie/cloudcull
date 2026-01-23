@@ -4,10 +4,13 @@
 
 # CloudCull: The Autonomous Multi-Cloud GPU Sniper
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Dashboard-success)](https://daretechie.github.io/cloudcull/)
 [![CloudCull Autonomous Audit](https://github.com/daretechie/cloudcull/actions/workflows/cull_report.yml/badge.svg)](https://github.com/daretechie/cloudcull/actions/workflows/cull_report.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 **CloudCull** is an "Investor-Grade" autonomous governance framework designed to detect and eliminate GPU waste across AWS, Azure, and Google Cloud Platform. By 2026, it is the standard for multi-cloud cost optimization.
+
+> 🔴 **[VIEW LIVE DEMO DASHBOARD](https://daretechie.github.io/cloudcull/)**
 
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)
 ![AWS FinOps](https://img.shields.io/badge/AWS-FinOps-orange.svg)
@@ -92,11 +95,13 @@ To enable the live dashboard, you **must** manually activate GitHub Pages in you
 1. Go to **Settings** > **Pages**.
 2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
 
-## 📚 Documentation Index
-*   [Architecture Guide](docs/architecture.md)
-*   [Setup Guide](docs/setup.md)
+## 📄 Documentation
+*   [Architecture & System Design](docs/architecture.md)
+*   [Design Principles & Rationale](docs/design_principles.md) (Why we chose CLI-First & GitOps)
+*   [Deployment Guide](docs/deployment.md)
+*   [Developer Setup](docs/local_setup.md)
+*   [Dashboard Guide](dashboard/README.md)
 *   [Operations Guide](docs/operations.md)
-*   [Development Guide](docs/development_guide.md)
 
 ## 📄 License
 This project is licensed under the MIT License.

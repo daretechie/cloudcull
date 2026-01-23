@@ -13,7 +13,14 @@ import {
   DollarSign,
   TrendingUp,
   Cpu,
-  ArrowRight
+  ArrowRight,
+  Terminal as TerminalIcon,
+  ChevronUp,
+  ChevronDown,
+  Terminal,
+  Copy,
+  BrainCircuit,
+  ShieldCheck
 } from 'lucide-react';
 import './App.css';
 
@@ -62,10 +69,63 @@ const Gauge = ({ value, max = 100, label }) => {
   );
 };
 
+const SniperLog = ({ instances }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  const scrollRef = useRef(null);
+  
+  const logs = [
+    { time: "22:04:12", tag: "SYSTEM", msg: "CloudCull Engine initialized..." },
+    { time: "22:04:13", tag: "PROBE",  msg: "Scanning AWS/Azure/GCP clusters..." },
+    { time: "22:04:14", tag: "BRAIN",  msg: "Classifying targets via Machine Intelligence..." },
+    ...instances.map(inst => ({
+      time: "22:04:14",
+      tag: "SNIPER",
+      msg: `Target ${inst.id.substring(0, 10)}... classified as ${inst.status}`
+    })),
+    { time: "22:04:15", tag: "REPORT", msg: "State-of-the-Art data synchronized." }
+  ];
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+  return (
+    <div className="sniper-log" style={{ height: isOpen ? 'auto' : '40px' }}>
+      <div className="terminal-header" onClick={() => setIsOpen(!isOpen)}>
+        <div className="terminal-title">
+          <TerminalIcon size={14} /> SNIPER_CONSOLE_v1.07.EXE
+        </div>
+        {isOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+      </div>
+      {isOpen && (
+        <div className="terminal-body" ref={scrollRef}>
+          {logs.map((log, i) => (
+            <div key={i} className="log-line">
+              <span className="log-time">[{log.time}]</span>
+              <span className="log-tag">{log.tag}:</span>
+              <span className="log-msg">{log.msg}</span>
+            </div>
+          ))}
+          <div className="log-line">
+            <span className="log-tag">&gt;</span>
+            <motion.span 
+              animate={{ opacity: [1, 0] }} 
+              transition={{ repeat: Infinity, duration: 0.8 }}
+            >_</motion.span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [copiedId, setCopiedId] = useState(null);
 
   useEffect(() => {
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -86,6 +146,12 @@ function App() {
         setLoading(false);
       });
   }, []);
+
+  const copyCommand = (cmd, id) => {
+    navigator.clipboard.writeText(cmd);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -143,7 +209,7 @@ function App() {
             </div>
             <div className="header-status">
               <span className="status-dot"></span> 
-              <Activity size={14} className="pulse-icon" /> SERVICE ACTIVE
+              <Activity size={14} className="pulse-icon" /> SNIPER ACTIVE
             </div>
           </div>
         </header>
@@ -187,8 +253,8 @@ function App() {
 
         <section className="cards-section">
           <div className="section-title">
-            <h2><Zap size={18} /> DETECTED ANOMALIES</h2>
-            <div className="anomaly-count">{data.instances.length} TARGETS ACQUIRED</div>
+            <h2><Zap size={18} /> TARGETS ACQUIRED</h2>
+            <div className="anomaly-count">{data.instances.length} ANOMALIES DETECTED</div>
           </div>
           
           <div className="anomaly-grid">
@@ -212,6 +278,13 @@ function App() {
                     </div>
                     {inst.status === 'ZOMBIE' ? <AlertTriangle size={20} color="#ff2a6d" /> : <CheckCircle2 size={20} color="#05f874" />}
                   </div>
+
+                  {inst.reasoning && (
+                    <div className="sniper-reasoning">
+                      <BrainCircuit size={14} style={{ marginBottom: '0.5rem', color: 'var(--neon-purple)' }} />
+                      <div>{inst.reasoning}</div>
+                    </div>
+                  )}
 
                   <div className="card-metrics">
                     <div className="metric-item">
@@ -241,10 +314,21 @@ function App() {
 
                   <div className="card-footer">
                     <div className="waste-info">
+                      <span className="owner-tag">LAUNCHED BY @{inst.owner}</span>
                       <span className="waste-amount">${(inst.rate * 24 * 30).toLocaleString()}</span>
-                      <span className="owner-tag">BY @{inst.owner}</span>
                     </div>
-                    <ArrowRight size={18} color="#94a3b8" />
+                    <div className="snip-actions">
+                      {inst.iac_command && (
+                        <button 
+                          className="snip-button" 
+                          title="Copy Kill Command"
+                          onClick={() => copyCommand(inst.iac_command, inst.id)}
+                        >
+                          {copiedId === inst.id ? <ShieldCheck size={18} color="#05f874" /> : <Copy size={18} />}
+                        </button>
+                      )}
+                      <ArrowRight size={18} color="#94a3b8" />
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -252,6 +336,7 @@ function App() {
           </div>
         </section>
       </motion.div>
+      <SniperLog instances={data.instances} />
     </div>
   );
 }

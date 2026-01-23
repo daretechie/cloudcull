@@ -1,25 +1,41 @@
-# Contributing to CloudCull 🛡️
+# CloudCull Development Guide
 
-Thank you for your interest in contributing to CloudCull! We welcome contributions from the community to help make this tool even more effective in stopping GPU waste.
+## Philosophy: TDD-First
+We follow a strict Test-Driven Development workflow. **No code is pushed without a passing test.**
 
-## How to Contribute
+## Workflow
+1.  **Write a Test**: Create a new test file in `tests/unit/`.
+2.  **Red**: Run `pytest` and watch it fail.
+3.  **Green**: Implement the minimal code to pass the test.
+4.  **Refactor**: Clean up and optimize.
 
-1.  **Fork the Repository:** Create your own fork of the repository on GitHub.
-2.  **Clone the Repository:** Clone your fork to your local machine.
-3.  **Create a Branch:** Create a new branch for your changes.
-4.  **Make Changes:** Implement your changes and ensure they follow the project's coding standards.
-5.  **Commit Changes:** Commit your changes with clear and descriptive commit messages.
-6.  **Push Changes:** Push your changes to your fork on GitHub.
-7.  **Submit a Pull Request:** Submit a pull request to the main repository, explaining your changes and their benefits.
+## Running Tests
+```bash
+# Run all tests
+uv run pytest
 
-## Areas for Contribution
+# Run specific suite
+uv run pytest tests/unit/adapters/test_aws.py
+```
 
-*   **Multi-Cloud Adapters:** Implement full discovery logic for GCP and Azure.
-*   **Metric Probing:** Add more granular metric checks (e.g., Disk I/O, OS-level signals).
-*   **AI Models:** Add support for more LLM providers in the `LLMAdapter`.
-*   **Pricing APIs:** Integrate with more cloud pricing APIs for accurate cost analysis.
-*   **Documentation:** Improve documentation and add more examples.
+## Extending CloudCull
 
-## Code of Conduct
+### Adding a New Cloud Provider
+1.  Create `adapters/newcloud.py`.
+2.  Implement `scan()`, `get_metrics()`, and `stop_instance()`.
+3.  Add it to `CloudCullRunner` in `main.py`.
+4.  **Requirement**: Must support `--simulated` mode.
 
-Please follow our Code of Conduct in all your interactions with the project and its community.
+### Adding a New LLM Provider
+1.  Inherit from `BaseLLM` in `llm/base.py`.
+2.  Implement `classify_instance()`.
+3.  Register in `llm/factory.py`.
+
+## Dashboard Development
+The dashboard is a standard Vite + React app.
+```bash
+cd dashboard
+npm install
+npm run dev
+```
+It reads data from `public/report.json`.
