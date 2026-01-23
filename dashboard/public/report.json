@@ -1,0 +1,42 @@
+{
+  "summary": {
+    "total_monthly_savings": 3722.4,
+    "zombie_count": 2,
+    "timestamp": "2026-01-23T11:32:48.378295+00:00"
+  },
+  "instances": [
+    {
+      "platform": "AZURE",
+      "id": "mock-vm-gpu-01",
+      "type": "Standard_NC6",
+      "metrics": {
+        "max_cpu": 1.2,
+        "network_in": 0.01
+      },
+      "owner": "dev_analyst",
+      "metadata": {
+        "location": "eastus",
+        "resource_id": "/mock/id"
+      },
+      "status": "ZOMBIE",
+      "rate": 1.5
+    },
+    {
+      "platform": "GCP",
+      "id": "mock-gpu-node-99",
+      "type": "a2-highgpu-1g",
+      "metrics": {
+        "max_cpu": 0.5,
+        "network_in": 0.02
+      },
+      "owner": "ml_engineer",
+      "metadata": {
+        "zone": "us-central1-a",
+        "id": "9999",
+        "labels": {}
+      },
+      "status": "ZOMBIE",
+      "rate": 3.67
+    }
+  ]
+}
