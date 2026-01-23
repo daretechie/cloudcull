@@ -93,7 +93,21 @@ Resource: gcp-ml-node-99 | Action: terraform state rm aws_instance.gcp-ml-node-9
 
 ---
 
-## 📄 Documentation
+## � Deployment & CI/CD
+
+### GitHub Actions
+CloudCull uses GitHub Actions for autonomous hourly audits. Ensure the following secrets are configured in your repository:
+- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+- `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc.
+
+### 🌐 Dashboard (GitHub Pages)
+> [!IMPORTANT]
+> To enable the live dashboard, you **must** manually activate GitHub Pages in your repository settings:
+> 1. Go to **Settings** > **Pages**.
+> 2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
+> 3. The next workflow run will automatically deploy the dashboard to your GitHub Pages URL.
+
+## �📄 Documentation
 *   [Strategic Blueprint](docs/blueprint.md)
 *   [Architecture Rationale](docs/architecture_rationale.md)
 
