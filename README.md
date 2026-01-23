@@ -30,10 +30,10 @@ CloudCull follows a robust, CLI-first automation flow designed for deep integrat
 
 ```mermaid
 graph LR
-    Trigger[Cron / GitHub Action] --> Probe[Probe: Multi-Cloud SDKs]
-    Probe --> Analyzer[Analyzer: Multi-Model AI]
-    Analyzer -- "Decision: Zombie Identified" --> UI[UI: Approval Notification]
-    UI -- "Approve" --> Execute[Execution: Boto3/SDK Terminate]
+    Trigger["Cron / GitHub Action"] --> Probe["Probe: Multi-Cloud SDKs"]
+    Probe --> Analyzer["Analyzer: Multi-Model AI"]
+    Analyzer -- "Decision: Zombie Identified" --> UI["UI: Approval Notification"]
+    UI -- "Approve" --> Execute["Execution: Boto3/SDK Terminate"]
 ```
 
 ## 🏗️ Key Features
