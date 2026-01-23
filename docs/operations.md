@@ -6,6 +6,13 @@ The functionality is defined in `.github/workflows/cull_report.yml`.
 - **Trigger**: Push to `main` or Manual Dispatch.
 - **Output**: Deploys to `gh-pages` branch.
 
+### Required GitHub Secrets
+To run a real multi-cloud audit, add these to **Settings > Secrets and variables > Actions**:
+- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
+- `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+- `GOOGLE_CREDENTIALS_JSON` (Base64 encoded SA key), `GOOGLE_CLOUD_PROJECT`
+- `ANTHROPIC_API_KEY` (or other AI keys)
+
 ## Runbooks
 
 ### S1: Dashboard Not Updating
