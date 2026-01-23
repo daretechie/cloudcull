@@ -1,0 +1,15 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.coverage
+htmlcov
+dashboard/node_modules
+dashboard/dist
+reports
+.env
+node_modules
+dist
+uv.lock

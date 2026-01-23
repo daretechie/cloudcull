@@ -1,0 +1,19 @@
+services:
+  cloudcull:
+    build: .
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AZURE_SUBSCRIPTION_ID=${AZURE_SUBSCRIPTION_ID}
+      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
+      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/secrets/gcp-creds.json
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    volumes:
+      - ./reports:/app/reports
+      - ${GOOGLE_APPLICATION_CREDENTIALS}:/app/secrets/gcp-creds.json:ro
+    command: ["--simulated", "--dry-run", "--output", "/app/reports/report.json"]

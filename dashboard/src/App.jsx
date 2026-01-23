@@ -1,37 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import './App.css';
-
-function App() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Dynamically handle GitHub Pages base path
-    const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
-    fetch(`${basePath}/report.json`)
-      .then(res => res.json())
-      .then(json => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to load report:", err);
-        setLoading(false);
-      });
-  }, []);
-
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Zap, 
   Target, 
   Activity, 
-  ExternalLink, 
   AlertTriangle, 
   CheckCircle2,
   Clock,
   Box,
   Server
 } from 'lucide-react';
+import './App.css';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -55,7 +34,9 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const reportPath = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/report.json`;
+    const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+    const reportPath = `${basePath}/report.json`;
+    
     fetch(reportPath)
       .then(res => res.json())
       .then(d => {
@@ -111,7 +92,7 @@ function App() {
 
         <section className="hero-stats">
           <motion.div className="hero-card savings-card" variants={itemVariants}>
-            <div className="hero-label"><Target size={14} inline /> POTENTIAL MONTHLY RECOVERY</div>
+            <div className="hero-label"><Target size={14} /> POTENTIAL MONTHLY RECOVERY</div>
             <motion.div 
               className="hero-value glowing-text"
               initial={{ scale: 0.8 }}
@@ -187,7 +168,7 @@ function App() {
             </table>
           </div>
         </section>
-      </div>
+      </motion.div>
     </div>
   );
 }
