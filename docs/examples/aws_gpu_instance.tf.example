@@ -1,0 +1,23 @@
+# Example AWS GPU Instance for CloudCull Targets
+# Use this as a reference or template. 
+
+resource "aws_instance" "gpu_worker" {
+  ami           = "ami-0c55b159cbfafe1f0" # Deep Learning AMI
+  instance_type = "g4dn.xlarge"
+
+  tags = {
+    Name        = "gpu-research-node-01"
+    Environment = "research"
+    Owner       = "ml-team-alpha"
+    # SENSITIVE DATA (Scrubbed by CloudCull)
+    admin_token = "secret-12345" 
+  }
+
+  root_block_device {
+    volume_size = 100
+    volume_type = "gp3"
+  }
+}
+
+# CloudCull will interact with this via 'terraform state rm' during snipe phase
+# to prevent resource reconstruction if managed by IaC elsewhere.

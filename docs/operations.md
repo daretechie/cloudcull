@@ -33,10 +33,16 @@ The "Sniper Console" allows for precision manual remediation:
 
 ### S4: ActiveOps (Automated Remediation)
 For high-speed, autonomous governance:
-1.  **Generate**: Run `uv run python main.py --active-ops`.
-2.  **Verify**: CloudCull will generate `remediation.sh` and `remediation_manifest.json`.
-3.  **Approve**: The CLI will prompt for a final confirmation before executing the generated bundle.
+1.  **Analyze**: Run `uv run python main.py --active-ops`.
+2.  **Verify**: CloudCull will directly execute remediation steps via secure `subprocess` and generate `remediation_manifest.json`.
+3.  **Approve**: The CLI will prompt for a final confirmation before executing the remediation actions (Physical Stop + State RM).
 4.  **Audit**: Review the `remediation_manifest.json` for a post-mortem of all actions taken.
+
+### S6: Partial Remediation Failure
+1.  **Scenario**: Physical stop succeeds, but Terraform state removal fails.
+2.  **Detection**: CLI logs: "Terraform Execution Failed for [ID]".
+3.  **Action**: Manually run the "Copy Kill Command" from the Sniper Console to synchronize the state.
+4.  **Verification**: Re-run the audit and confirm the instance is no longer identified.
 
 ### S5: Emergency Kill-Switch (CLI)
 To verify the kill-switch works without cost:

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -23,6 +23,11 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
+
+      - name: Security Scan (Bandit & pip-audit)
+        run: |
+          uv run bandit -r . -ll -ii
+          uv run pip-audit
 
       - name: Run CloudCull Audit
         env:

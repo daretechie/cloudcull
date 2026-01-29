@@ -12,7 +12,7 @@
 
 > 🔴 **[VIEW LIVE DEMO DASHBOARD](https://daretechie.github.io/cloudcull/)**
 
-![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)
+![Python 3.14](https://img.shields.io/badge/Python-3.14-green.svg)
 ![AWS FinOps](https://img.shields.io/badge/AWS-FinOps-orange.svg)
 ![GCP FinOps](https://img.shields.io/badge/GCP-FinOps-blue.svg)
 ![Azure FinOps](https://img.shields.io/badge/Azure-FinOps-blue.svg)
@@ -36,7 +36,8 @@ graph LR
     Trigger["Cron / GitHub Action"] --> Probe["Probe: Multi-Cloud SDKs"]
     Probe --> Analyzer["Analyzer: Multi-Model AI"]
     Analyzer -- "Decision: Zombie Identified" --> UI["UI: Approval Notification"]
-    UI -- "Approve" --> Execute["Execution: Boto3/SDK Terminate"]
+    UI -- "Approve" --> Stop["Stop: Cloud Native API"]
+    Stop --> StateRM["State RM: Terraform"]
 ```
 
 ## 🏗️ Key Features
@@ -60,19 +61,34 @@ cd cloudcull
 uv sync
 ```
 
-### 2. Run a Demonstration (Simulated Mode)
+### 2. Run a Demonstration (Full Walkthrough)
+This script simulates a multi-cloud audit and remediation flow with high-fidelity logs.
 ```bash
-uv run python main.py --simulated --dry-run
+./scripts/demo.sh
 ```
 
 ### 3. Execution (ActiveOps)
 To run a real-world audit and trigger the automated remediation bundle:
 ```bash
-uv run python main.py --region us-east-1 --active-ops
+uv run cloudcull --region us-east-1 --active-ops
 ```
 
 > [!CAUTION]
-> `--active-ops` will generate `remediation.sh` and prompt for execution. Use with high-stakes environments after dry-run verification.
+> `--active-ops` will perform cloud-native stop actions and generate `config/remediation_manifest.json`. Use with high-stakes environments after dry-run verification.
+
+---
+
+## 📂 Repository Orientation
+
+| Directory | Purpose |
+| :--- | :--- |
+| `src/` | **Source Code.** All Python modules, adapters, and the main entrypoint. |
+| `infra/` | **Infrastructure.** Dockerfile, Docker Compose, and future IaC (Terraform). |
+| `config/` | **Configuration.** Static and dynamic manifests (e.g., remediation plans). |
+| `scripts/` | **Tooling.** Utility scripts and demonstration walkers. |
+| `docs/` | **Documentation.** Architecture, Operations, and Security guides. |
+| `tests/` | **Validation.** Unit and integration test suites. |
+| `dashboard/` | **Visualization.** React + Vite frontend for Passive Monitoring. |
 
 ---
 
@@ -83,7 +99,7 @@ CloudCull is container-ready for consistent execution.
 #### Running with Docker
 ```bash
 # Build & Run
-docker build -t cloudcull .
+docker build -f infra/Dockerfile -t cloudcull .
 docker run --env-file .env cloudcull --simulated --dry-run
 ```
 
@@ -99,8 +115,7 @@ To enable the live dashboard, you **must** manually activate GitHub Pages in you
 2. Under **Build and deployment** > **Source**, select **GitHub Actions**.
 
 ## 📄 Documentation
-*   [Architecture & System Design](docs/architecture.md)
-*   [Design Principles & Rationale](docs/design_principles.md) (Why we chose CLI-First & GitOps)
+*   [Architecture & System Design](docs/architecture.md) (Includes Core Design Principles)
 *   [Deployment Guide](docs/deployment.md)
 *   [Developer Setup](docs/local_setup.md)
 *   [Dashboard Guide](dashboard/README.md)

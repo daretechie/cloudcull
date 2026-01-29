@@ -1,7 +1,7 @@
 # CloudCull Setup Guide
 
 ## Prerequisites
-- Python 3.12+
+- Python 3.14+
 - Node.js 20+ (for dashboard)
 - `uv` package manager (recommended)
 
@@ -47,6 +47,6 @@ export OPENAI_API_KEY="sk-..."
 ## Simulated Mode (Demo)
 To run CloudCull without *any* of the above credentials:
 ```bash
-uv run python main.py --simulated --dry-run
+uv run cloudcull --simulated --dry-run
 ```
 This will generate a high-fidelity mock report.

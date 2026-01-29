@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useId, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import mermaid from 'mermaid';
 import { 
@@ -26,29 +26,53 @@ import './App.css';
 
 // Initialize Mermaid
 mermaid.initialize({
-  startOnLoad: true,
+  startOnLoad: false, // Set to false for manual rendering
   theme: 'dark',
-  securityLevel: 'loose',
-  fontFamily: 'Outfit',
+  securityLevel: 'loose', // Needed for some SVG features
+  fontFamily: 'system-ui, -apple-system, sans-serif', // Fallback to system fonts
   themeVariables: {
     primaryColor: '#00f2fe',
     lineColor: '#94a3b8',
-    textColor: '#ffffff'
+    textColor: '#ffffff',
+    fontSize: '12px'
   }
 });
 
 const Mermaid = ({ chart }) => {
   const ref = useRef(null);
+  const chartId = useId().replace(/:/g, "");
 
   useEffect(() => {
+    let isMounted = true;
     if (ref.current && chart) {
-      mermaid.render('mermaid-chart', chart).then((result) => {
-        ref.current.innerHTML = result.svg;
-      });
-    }
-  }, [chart]);
+      // Small timeout to ensure DOM is ready for measurement
+      const renderTimer = setTimeout(() => {
+        if (!isMounted) return;
+        
+        try {
+          ref.current.innerHTML = '';
+          const uniqueId = `mermaid-${chartId}`;
+          mermaid.render(uniqueId, chart).then((result) => {
+            if (isMounted && ref.current) {
+              ref.current.innerHTML = result.svg;
+            }
+          }).catch(err => {
+            console.error("Mermaid render failed:", err);
+            if (ref.current) ref.current.innerHTML = '<div class="diag-error">TOPOLOGY_LOAD_FAILED</div>';
+          });
+        } catch (err) {
+          console.error("Mermaid critical error:", err);
+        }
+      }, 100);
 
-  return <div ref={ref} className="mermaid-wrapper" />;
+      return () => {
+        isMounted = false;
+        clearTimeout(renderTimer);
+      };
+    }
+  }, [chart, chartId]);
+
+  return <div ref={ref} className="mermaid-wrapper" style={{ minHeight: '150px' }} />;
 };
 
 const Gauge = ({ value, max = 100, label }) => {
@@ -71,25 +95,58 @@ const Gauge = ({ value, max = 100, label }) => {
 
 const SniperLog = ({ instances }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [rawLogs, setRawLogs] = useState([]);
   const scrollRef = useRef(null);
-  
-  const logs = [
-    { time: "22:04:12", tag: "SYSTEM", msg: "CloudCull Engine initialized..." },
-    { time: "22:04:13", tag: "PROBE",  msg: "Scanning AWS/Azure/GCP clusters..." },
-    { time: "22:04:14", tag: "BRAIN",  msg: "Classifying targets via Machine Intelligence..." },
-    ...instances.map(inst => ({
-      time: "22:04:14",
-      tag: "SNIPER",
-      msg: `Target ${inst.id.substring(0, 10)}... classified as ${inst.status}`
-    })),
-    { time: "22:04:15", tag: "REPORT", msg: "State-of-the-Art data synchronized." }
-  ];
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+  // Real Log Fetcher
+  useEffect(() => {
+    const fetchLogs = () => {
+      fetch(`${basePath}/sniper.log`)
+        .then(res => res.text())
+        .then(text => {
+          if (!text) return;
+          const lines = text.split('\n')
+            .filter(l => l.trim())
+            .map(line => {
+              const match = line.match(/^([\d-]+\s[\d:,]+)\s-\s\[CloudCull\]\s-\s(\w+)\s-\s(.+)$/);
+              if (match) {
+                return { time: match[1].split(' ')[1], tag: match[2], msg: match[3] };
+              }
+              return { time: '--:--:--', tag: 'INFO', msg: line };
+            });
+          setRawLogs(lines);
+        })
+        .catch(() => {}); // Silent fail for logs
+    };
+
+    fetchLogs();
+    const interval = setInterval(fetchLogs, 2000);
+    return () => clearInterval(interval);
+  }, [basePath]);
+
+  const displayLogs = React.useMemo(() => {
+    if (rawLogs.length > 0) return rawLogs;
+    if (instances.length > 0) {
+      const baseLogs = [
+        { time: new Date().toLocaleTimeString(), tag: "SYSTEM", msg: "CloudCull Engine initialized..." },
+        { time: new Date().toLocaleTimeString(), tag: "PROBE",  msg: "Scanning AWS/Azure/GCP clusters..." },
+      ];
+      const instanceLogs = instances.map(inst => ({
+        time: new Date().toLocaleTimeString(),
+        tag: "SNIPER",
+        msg: `Target ${inst.id.substring(0, 10)}... classified as ${inst.status}`
+      }));
+      return [...baseLogs, ...instanceLogs];
+    }
+    return [];
+  }, [rawLogs, instances]);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [logs]);
+  }, [displayLogs]);
 
   return (
     <div className="sniper-log" style={{ height: isOpen ? 'auto' : '40px' }}>
@@ -101,7 +158,7 @@ const SniperLog = ({ instances }) => {
       </div>
       {isOpen && (
         <div className="terminal-body" ref={scrollRef}>
-          {logs.map((log, i) => (
+          {displayLogs.map((log, i) => (
             <div key={i} className="log-line">
               <span className="log-time">[{log.time}]</span>
               <span className="log-tag">{log.tag}:</span>
@@ -127,25 +184,51 @@ function App() {
   const [error, setError] = useState(null);
   const [copiedId, setCopiedId] = useState(null);
 
+  const sniperChart = useMemo(() => `
+    graph LR
+      Probe[Probe: SDKs] --> Analyze[Analyze: AI]
+      Analyze --> Decision{Decision}
+      Decision -- "Zombie" --> Cull[Action: Cull]
+      Decision -- "Healthy" --> Monitor[Monitor]
+      Cull --> Sync[Report: Stats]
+      Monitor --> Sync
+      style Probe fill:transparent,stroke:#00f2fe,color:#fff
+      style Analyze fill:transparent,stroke:#bd00ff,color:#fff
+      style Decision fill:transparent,stroke:#f7b731,color:#fff
+      style Cull fill:transparent,stroke:#ff2a6d,color:#fff
+      style Monitor fill:transparent,stroke:#05f874,color:#fff
+      style Sync fill:transparent,stroke:#00f2fe,color:#fff
+  `, []);
+
   useEffect(() => {
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
     const reportPath = `${basePath}/report.json`;
     
-    fetch(reportPath)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-        return res.json();
-      })
-      .then(d => {
-        setData(d);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to load audit report:", err);
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+    const fetchData = () => {
+      fetch(reportPath)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+          return res.json();
+        })
+        .then(d => {
+          setData(d);
+          setLoading(false);
+          setError(null); // Clear error on success
+        })
+        .catch(err => {
+          console.error("Failed to load audit report:", err);
+          // Only show error screen if we don't already have data (prevents flickering)
+          if (!data) {
+            setError(err.message);
+            setLoading(false);
+          }
+        });
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, [data]);
 
   const copyCommand = (cmd, id) => {
     navigator.clipboard.writeText(cmd);
@@ -174,21 +257,6 @@ function App() {
     </div>
   );
 
-  const sniperChart = `
-    graph LR
-      Probe[Probe: SDKs] --> Analyze[Analyze: AI]
-      Analyze --> Decision{Decision}
-      Decision -- "Zombie" --> Cull[Action: Cull]
-      Decision -- "Healthy" --> Monitor[Monitor]
-      Cull --> Sync[Report: Stats]
-      Monitor --> Sync
-      style Probe fill:transparent,stroke:#00f2fe,color:#fff
-      style Analyze fill:transparent,stroke:#bd00ff,color:#fff
-      style Decision fill:transparent,stroke:#f7b731,color:#fff
-      style Cull fill:transparent,stroke:#ff2a6d,color:#fff
-      style Monitor fill:transparent,stroke:#05f874,color:#fff
-      style Sync fill:transparent,stroke:#00f2fe,color:#fff
-  `;
 
   return (
     <div className="app-container">
@@ -200,7 +268,15 @@ function App() {
       >
         <header className="dashboard-header">
           <motion.div className="logo-container" whileHover={{ scale: 1.02 }}>
-            <img src={`${basePath}/logo.png`} alt="CloudCull" className="brand-logo" />
+            <img 
+              src={`${basePath}/logo.png`} 
+              alt="CloudCull" 
+              className="brand-logo" 
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentNode.innerHTML = '<div class="fallback-logo">CLOUDCULL</div>';
+              }}
+            />
           </motion.div>
           
           <div className="header-meta">
@@ -320,6 +396,7 @@ function App() {
                     <div className="snip-actions">
                       {inst.iac_command && (
                         <button 
+                          id={`snip-button-${inst.id}`}
                           className="snip-button" 
                           title="Copy Kill Command"
                           onClick={() => copyCommand(inst.iac_command, inst.id)}
