@@ -50,3 +50,27 @@ To run CloudCull without *any* of the above credentials:
 uv run cloudcull --simulated --dry-run
 ```
 This will generate a high-fidelity mock report.
+
+## Secure Dashboard
+
+The dashboard is served via a secure Python backend to protect sensitive logs.
+
+1.  **Build the Frontend** (once):
+    ```bash
+    cd dashboard
+    npm run build
+    cd ..
+    ```
+
+2.  **Start the Secure Server**:
+    ```bash
+    python3 src/dashboard_server.py
+    ```
+    Access at `http://localhost:8000`.
+
+### Legacy Dev Mode
+*Note: Will not be able to access secured logs.*
+```bash
+cd dashboard
+npm run dev
+```

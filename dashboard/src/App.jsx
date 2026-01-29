@@ -102,7 +102,7 @@ const SniperLog = ({ instances }) => {
   // Real Log Fetcher
   useEffect(() => {
     const fetchLogs = () => {
-      fetch(`${basePath}/sniper.log`)
+      fetch(`/api/logs`)
         .then(res => res.text())
         .then(text => {
           if (!text) return;
@@ -202,7 +202,7 @@ function App() {
 
   useEffect(() => {
     const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
-    const reportPath = `${basePath}/report.json`;
+    const reportPath = `/api/report`;
     
     const fetchData = () => {
       fetch(reportPath)

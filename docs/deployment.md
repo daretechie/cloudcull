@@ -26,4 +26,6 @@ Once the first audit completes, your dashboard will be available at:
 ---
 
 > [!TIP]
-> **Least Privilege Practice:** We recommend creating a dedicated IAM role with only the `ec2:DescribeInstances`, `cloudwatch:GetMetricStatistics`, and `ec2:StopInstances` permissions.
+> **Least Privilege Practice:** We recommend creating a dedicated IAM role.
+> - **AWS:** `ec2:DescribeInstances`, `cloudwatch:GetMetricStatistics`, `ec2:StopInstances`
+> - **GCP:** `compute.instances.list`, `monitoring.timeSeries.list`, `compute.instances.stop`, `logging.privateLogEntries.list` (for attribution)
