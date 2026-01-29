@@ -38,11 +38,24 @@ def test_execute_active_ops_calls_stop_before_terraform(mock_context):
     manager = MagicMock()
     manager.attach_mock(aws.stop_instance, 'stop_instance')
     
-    # We need to mock the remediator correctly
-    with patch('src.main.TerraformRemediator') as mock_remediator_class:
+    # We need to mock the remediator and discovery correctly
+    with patch('src.main.TerraformRemediator') as mock_remediator_class, \
+         patch('src.main.AdapterRegistry') as mock_registry, \
+         patch('src.main.DiscoveryService') as mock_discovery_class, \
+         patch('src.main.LLMFactory.get_provider'):
+
+        # Setup Remediator
         mock_remediator = mock_remediator_class.return_value
         manager.attach_mock(mock_remediator.execute_remediation_plan, 'execute_remediation_plan')
         
+        # Setup Discovery to pass connection check
+        mock_discovery = mock_discovery_class.return_value
+        aws.verify_connection.return_value = True
+        mock_discovery.adapters = [aws]
+        
+        # Setup Registry for active ops
+        mock_registry.get_adapter_by_platform.return_value = aws 
+
         zombies = [{
             'id': 'i-123',
             'platform': 'AWS',

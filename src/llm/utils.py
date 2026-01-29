@@ -18,9 +18,8 @@ def sanitize_for_prompt(obj: Any) -> Any:
         return [sanitize_for_prompt(i) for i in obj]
     elif isinstance(obj, str):
         # Defang standard injection patterns
-        # 1. Replace brackets to break JSON injection attempts
-        # 2. Limit length to prevent DoS via token exhaustion
-        clean = obj.replace("{", "(").replace("}", ")").replace("```", "'''")
+        # 1. Neutralize Markdown code blocks which can confuse parsers
+        clean = obj.replace("```", "'''")
         
         # 3. Strip explicit "System:" or "Instruction:" prefixes that might confuse the model
         blocklist = ["System:", "Instruction:", "Override:", "Ignore previous"]

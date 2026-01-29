@@ -28,32 +28,12 @@ class AWSAdapter(AbstractAdapter):
                 self.cw = None
                 self.cloudtrail = None
 
-    def get_metrics(self, instance_id: str, minutes: int = 60) -> Dict[str, float]:
-        """Precision Metric Probing: CPU + NetworkIn."""
-        end_time = datetime.datetime.now(datetime.UTC)
-        start_time = end_time - datetime.timedelta(minutes=minutes)
-        
-        def get_stat(metric_name: str, stat: str = 'Maximum') -> float:
-            try:
-                res = self.cw.get_metric_statistics(
-                    Namespace='AWS/EC2',
-                    MetricName=metric_name,
-                    Dimensions=[{'Name': 'InstanceId', 'Value': instance_id}],
-                    StartTime=start_time,
-                    EndTime=end_time,
-                    Period=3600,
-                    Statistics=[stat]
-                )
-                pts = res.get('Datapoints', [])
-                return pts[0][stat] if pts else 0.0
-            except Exception as e:
-                logger.error("Error fetching AWS metric %s for %s: %s", metric_name, instance_id, e)
-                return 0.0
+    def get_metrics(self, instance_id: str, **kwargs) -> Dict[str, float]:
+        """Satifies AbstractAdapter interface using batch logic."""
+        batch_results = self._get_batch_metrics([instance_id])
+        return batch_results.get(instance_id, {"max_cpu": 0.0, "network_in": 0.0})
 
-        return {
-            "max_cpu": get_stat('CPUUtilization'),
-            "network_in": get_stat('NetworkIn', 'Average') / (1024 * 1024) # MBs
-        }
+
 
     def get_attribution(self, instance_id: str, metadata: Dict = None) -> str:
         """
@@ -190,14 +170,16 @@ class AWSAdapter(AbstractAdapter):
             }]
 
         filters = [{'Name': 'instance-state-name', 'Values': ['running']}]
-        response = self.ec2.describe_instances(Filters=filters)
-        
         gpu_instances = []
-        for res in response['Reservations']:
-            for inst in res['Instances']:
-                itype = inst['InstanceType']
-                if any(gt in itype for gt in self.gpu_types):
-                    gpu_instances.append(inst)
+        paginator = self.ec2.get_paginator('describe_instances')
+        page_iterator = paginator.paginate(Filters=filters)
+
+        for page in page_iterator:
+            for res in page['Reservations']:
+                for inst in res['Instances']:
+                    itype = inst['InstanceType']
+                    if any(gt in itype for gt in self.gpu_types):
+                        gpu_instances.append(inst)
 
         if not gpu_instances:
             return []

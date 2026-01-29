@@ -18,8 +18,10 @@ class GCPAdapter(AbstractAdapter):
         if not self.simulated:
             try:
                 from google.auth.exceptions import GoogleAuthError
+                from google.cloud import logging_v2
                 self.instances_client = compute_v1.InstancesClient()
                 self.metric_client = monitoring_v3.MetricServiceClient()
+                self.logging_client = logging_v2.LoggingServiceV2Client()
             except GoogleAuthError as e:
                 logger.error("GCP Authentication Failed: %s. Ensure credentials are valid.", e)
                 self.instances_client = None
@@ -44,7 +46,7 @@ class GCPAdapter(AbstractAdapter):
                 }
             )
             
-            # CPU Utilization metric
+            # 1. CPU Utilization metric
             results = self.metric_client.list_time_series(
                 name=f"projects/{self.project_id}",
                 filter='metric.type="compute.googleapis.com/instance/cpu/utilization"',
@@ -57,10 +59,24 @@ class GCPAdapter(AbstractAdapter):
                 for point in result.points:
                     if point.value.double_value > max_cpu:
                         max_cpu = point.value.double_value
-            
+
+            # 2. Network Utilization
+            results_net = self.metric_client.list_time_series(
+                name=f"projects/{self.project_id}",
+                filter='metric.type="compute.googleapis.com/instance/network/received_bytes_count"',
+                interval=interval,
+                view=monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
+            )
+
+            max_net_bytes = 0.0
+            for result in results_net:
+                for point in result.points:
+                    if point.value.double_value > max_net_bytes:
+                        max_net_bytes = point.value.double_value
+
             return {
                 "max_cpu": max_cpu * 100, # Convert to percentage
-                "network_in": 0.02
+                "network_in": max_net_bytes / (1024 * 1024) # MBs
             }
         except Exception as e:
             logger.error("Error fetching GCP metrics for %s: %s", instance_id, e)
@@ -69,10 +85,32 @@ class GCPAdapter(AbstractAdapter):
     def get_attribution(self, instance_id: str, **kwargs) -> str:
         """
         Governance Layer: Production-Ready logging for identity mapping.
-        Note: Real production mapping requires the 'logging.v2.LoggingServiceV2Client'.
         """
-        logger.debug("Identity mapping triggered for GCP instance %s", instance_id)
-        return "gcp_service_principal"
+        if self.simulated or not self.logging_client:
+            return "gcp_service_principal"
+
+        try:
+            # Audit Logs: Method v1.compute.instances.insert
+            filter_str = (
+                f'resource.type="gce_instance" AND '
+                f'resource.labels.instance_id="{instance_id}" AND '
+                f'protoPayload.methodName="v1.compute.instances.insert"'
+            )
+            
+            entries = self.logging_client.list_entries(
+                resource_names=[f"projects/{self.project_id}"],
+                filter_=filter_str, 
+                max_results=1
+            )
+            
+            for entry in entries:
+                if entry.proto_payload and entry.proto_payload.authentication_info:
+                    return entry.proto_payload.authentication_info.principal_email
+                    
+        except Exception as e:
+            logger.warning("Attribution lookup failed for %s: %s", instance_id, e)
+            
+        return "Unknown"
 
     def scan(self) -> List[Dict]:
         logger.info("Probing GCP [%s] for GPU waste...", self.project_id)

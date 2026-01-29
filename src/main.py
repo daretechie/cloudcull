@@ -7,6 +7,13 @@ import sys
 from typing import List, Dict
 
 # Modular Imports
+import os
+from logging.handlers import RotatingFileHandler
+
+# Constants
+HOURS_PER_MONTH = 730  # Standardized average hours per month
+
+# Modular Imports
 from .adapters import AdapterRegistry
 from .core.pricing import CloudPricing
 from .llm.factory import LLMFactory
@@ -30,25 +37,23 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(log_formatter)
 logger.addHandler(console_handler)
 
-# Dashboard File Handler (Simulated stream for frontend)
+# Secure File Handler (Logs/ Directory)
 try:
-    import os
-    from logging.handlers import RotatingFileHandler
-    # Path relative to project root
-    log_dir = os.path.join(os.getcwd(), "dashboard", "public")
-    if os.path.exists(log_dir):
-        # Rotate logs: Max 10MB, keep 5 backups
-        file_handler = RotatingFileHandler(
-            os.path.join(log_dir, "sniper.log"), 
-            mode='a', 
-            maxBytes=10*1024*1024, 
-            backupCount=5
-        )
-        file_handler.setFormatter(log_formatter)
-        logger.addHandler(file_handler)
-except Exception:
-    # Do not crash the app if dashboard is missing, but log the warning
-    logger.warning("Failed to initialize Dashboard log handler. 'sniper.log' will not be written.", exc_info=True)
+    log_dir = os.path.join(os.getcwd(), "logs")
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+        
+    # Rotate logs: Max 10MB, keep 5 backups
+    file_handler = RotatingFileHandler(
+        os.path.join(log_dir, "sniper.log"), 
+        mode='a', 
+        maxBytes=10*1024*1024, 
+        backupCount=5
+    )
+    file_handler.setFormatter(log_formatter)
+    logger.addHandler(file_handler)
+except Exception as e:
+    logger.warning("Failed to initialize secure log handler: %s", e)
 
 class DiscoveryService:
     """Encapsulates multi-cloud target discovery."""
@@ -114,6 +119,7 @@ class CloudCullRunner:
     def __init__(self, region: str = "us-east-1", dry_run: bool = True, model: str = "claude", 
                  simulated: bool = False, auto_approve: bool = False, max_workers: int = 10):
         self.dry_run = dry_run
+        self.simulated = simulated
         self.auto_approve = auto_approve
         self.max_workers = max_workers
         self.discovery = DiscoveryService(region, simulated)
@@ -217,7 +223,7 @@ class CloudCullRunner:
             if t.get('rate_is_unknown'):
                 monthly = None
             else:
-                monthly = t['rate'] * 24 * 30
+                monthly = t['rate'] * HOURS_PER_MONTH
             
             if renderer:
                 renderer.print_row(t, monthly)
@@ -258,7 +264,7 @@ class CloudCullRunner:
             platform = z['platform'].upper()
             try:
                 # Find the matching adapter
-                adapter = next((a for a in self.discovery.adapters if type(a).__name__.upper().startswith(platform)), None)
+                adapter = AdapterRegistry.get_adapter_by_platform(platform, self.discovery.adapters[0].region, self.simulated)
                 if adapter:
                     logger.info("⚡ Stopping %s instance %s...", platform, z['id'])
                     adapter.stop_instance(z['id'], z['metadata'])
@@ -361,7 +367,7 @@ def main():
 
             json.dump({
                 "summary": {
-                    "total_monthly_savings": sum(r['rate'] * 24 * 30 for r in safe_results if r['status'] == "ZOMBIE"),
+                    "total_monthly_savings": sum(r['rate'] * HOURS_PER_MONTH for r in safe_results if r['status'] == "ZOMBIE"),
                     "zombie_count": sum(1 for r in safe_results if r['status'] == "ZOMBIE"),
                     "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
                 },
@@ -372,7 +378,7 @@ def main():
     # Push Final Metrics
     z_count = sum(1 for r in results if r['status'] == "ZOMBIE")
     # Handle unknown rates safely for the sum
-    safe_savings = sum(r['rate'] * 24 * 30 for r in results if r['status'] == "ZOMBIE" and not r.get('rate_is_unknown'))
+    safe_savings = sum(r['rate'] * HOURS_PER_MONTH for r in results if r['status'] == "ZOMBIE" and not r.get('rate_is_unknown'))
     
     ZOMBIE_GAUGE.set(z_count)
     SAVINGS_GAUGE.set(safe_savings)

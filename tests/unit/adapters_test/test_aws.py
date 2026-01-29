@@ -25,22 +25,27 @@ def test_aws_scan_finds_gpu_instances(mock_boto3_clients):
     ec2, cw, ct = mock_boto3_clients
     
     # Mock EC2 describe_instances
-    ec2.describe_instances.return_value = {
-        'Reservations': [{
-            'Instances': [
-                {
-                    'InstanceId': 'i-gpu-123',
-                    'InstanceType': 'g4dn.xlarge',
-                    'State': {'Name': 'running'}
-                },
-                {
-                    'InstanceId': 'i-cpu-456',
-                    'InstanceType': 't3.micro',
-                    'State': {'Name': 'running'}
-                }
-            ]
-        }]
-    }
+    # Mock EC2 describe_instances PAGINATOR
+    mock_ec2_paginator = MagicMock()
+    ec2.get_paginator.return_value = mock_ec2_paginator
+    mock_ec2_paginator.paginate.return_value = [
+        {
+            'Reservations': [{
+                'Instances': [
+                    {
+                        'InstanceId': 'i-gpu-123',
+                        'InstanceType': 'g4dn.xlarge',
+                        'State': {'Name': 'running'}
+                    },
+                    {
+                        'InstanceId': 'i-cpu-456',
+                        'InstanceType': 't3.micro',
+                        'State': {'Name': 'running'}
+                    }
+                ]
+            }]
+        }
+    ]
     
     # Mock CloudWatch metrics
     cw.get_metric_statistics.return_value = {
