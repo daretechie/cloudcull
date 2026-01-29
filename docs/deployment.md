@@ -14,6 +14,7 @@ Add the following secrets to your forked repository (`Settings > Secrets and var
 | `AWS_SECRET_ACCESS_KEY` | Corresponding secret key |
 | `ANTHROPIC_API_KEY` | Required if using Claude (High precision) |
 | `GEMINI_API_KEY` | Required if using Gemini (Low cost) |
+| `METRICS_PORT` | Port for Prometheus metrics (Default: 8000) |
 
 ## 3. Enable Automation
 The Sniper will run automatically according to the schedule in `.github/workflows/cull_report.yml`. 

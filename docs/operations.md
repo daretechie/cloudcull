@@ -36,7 +36,15 @@ For high-speed, autonomous governance:
 1.  **Analyze**: Run `uv run python main.py --active-ops`.
 2.  **Verify**: CloudCull will directly execute remediation steps via secure `subprocess` and generate `remediation_manifest.json`.
 3.  **Approve**: The CLI will prompt for a final confirmation before executing the remediation actions (Physical Stop + State RM).
-4.  **Audit**: Review the `remediation_manifest.json` for a post-mortem of all actions taken.
+4.  **Safety**: Before any destructive state removal, CloudCull automatically creates a backup: `terraform.tfstate.backup.<timestamp>`.
+5.  **Audit**: Review the `remediation_manifest.json` for a post-mortem of all actions taken.
+
+### S5: Monitoring Platform Health (Prometheus)
+CloudCull exposes real-time metrics for integration with Grafana or Datadog:
+1.  **Endpoint**: `http://localhost:8000/metrics` (configurable via `METRICS_PORT`).
+2.  **Key Gauges**:
+    - `cloudcull_zombies_found_total`: Current count of identified waste.
+    - `cloudcull_potential_savings_usd`: Projected monthly savings from pending remediation.
 
 ### S6: Partial Remediation Failure
 1.  **Scenario**: Physical stop succeeds, but Terraform state removal fails.

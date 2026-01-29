@@ -61,12 +61,17 @@ graph TD
 
 ### 5. Remediation Engine
 - **Philosophy**: "GitOps First". We generate sanitized `terraform state rm` commands to reconcile infrastructure state.
-- **Security**: All shell inputs (IDs, Platforms, Owners) are sanitized using `shlex.quote` to eliminate command injection vectors.
+- **Safety**: Automatically creates a timestamped backup of `terraform.tfstate` before any state-modification command is executed.
+- **Security**: All shell inputs (IDs, Platforms, Owners) are sanitized using `shlex.quote` and validated against alphanumeric safe-patterns.
 - **ActiveOps Artifacts**:
     - `remediation_manifest.json`: A structured manifest for CI/CD integration and auditing.
-- **Security**: No intermediate shell scripts are generated. All actions are executed via `subprocess.run` with list-based arguments and `shell=False`.
-- **Kill-Switch**: A `--no-dry-run` flag exists for direct API termination.
-- **Orchestration**: The `--active-ops` flag combined with `--auto-approve` enables headless, autonomous remediation.
+- **Security**: All actions are executed via secure `subprocess.run` with `shell=False`.
+- **Kill-Switch**: A `--active-ops` flag conducts both physical stops and state removals.
+
+### 6. Observability & Health
+- **Prometheus Integration**: Exposes platform-level metrics (zombies found, savings potential) on `/metrics`.
+- **Log Rotation**: Uses `RotatingFileHandler` to prevent log exhaustion on long-running worker nodes.
+
 # Design Principles: The "Sniper" Philosophy
 
 CloudCull is built on specific architectural decisions that differentiate it from generic scripts or "black box" SaaS tools.
