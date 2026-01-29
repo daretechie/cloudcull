@@ -12,7 +12,8 @@ logger = logging.getLogger("CloudCull.GCP")
 class GCPAdapter(AbstractAdapter):
     def __init__(self, project_id: str = None, simulated: bool = False):
         self.simulated = simulated
-        self.project_id = project_id or os.getenv("GOOGLE_CLOUD_PROJECT")
+        from ..core.settings import settings
+        self.project_id = project_id or settings.gcp_project_id
         
         if not self.simulated:
             try:

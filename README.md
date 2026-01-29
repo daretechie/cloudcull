@@ -12,7 +12,7 @@
 
 > 🔴 **[VIEW LIVE DEMO DASHBOARD](https://daretechie.github.io/cloudcull/)**
 
-![Python 3.14](https://img.shields.io/badge/Python-3.14-green.svg)
+![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)
 ![AWS FinOps](https://img.shields.io/badge/AWS-FinOps-orange.svg)
 ![GCP FinOps](https://img.shields.io/badge/GCP-FinOps-blue.svg)
 ![Azure FinOps](https://img.shields.io/badge/Azure-FinOps-blue.svg)
@@ -59,6 +59,11 @@ graph LR
 git clone https://github.com/daretechie/cloudcull.git
 cd cloudcull
 uv sync
+```
+
+**Alternative (Standard pip):**
+```bash
+pip install -r requirements.txt
 ```
 
 ### 2. Run a Demonstration (Full Walkthrough)

@@ -8,7 +8,7 @@ COPY dashboard/ ./
 RUN npm run build
 
 # 2. Final Python Image
-FROM python:3.14-slim
+FROM python:3.12-slim
 WORKDIR /app
 
 # Install uv

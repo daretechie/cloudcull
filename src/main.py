@@ -11,11 +11,19 @@ from .adapters import AdapterRegistry
 from .core.pricing import CloudPricing
 from .llm.factory import LLMFactory
 from .core.remediation import TerraformRemediator
+from .core.settings import settings
+
+# Observability Imports
+from prometheus_client import start_http_server, Gauge
+
+# Define Metrics
+ZOMBIE_GAUGE = Gauge('cloudcull_zombies_found_total', 'Total number of zombie instances detected')
+SAVINGS_GAUGE = Gauge('cloudcull_potential_savings_usd', 'Potential monthly savings in USD')
 
 # Configure logging
 log_formatter = logging.Formatter('%(asctime)s - [CloudCull] - %(levelname)s - %(message)s')
 logger = logging.getLogger("CloudCull")
-logger.setLevel(logging.INFO)
+logger.setLevel(settings.log_level)
 
 # Console Handler
 console_handler = logging.StreamHandler()
@@ -25,15 +33,22 @@ logger.addHandler(console_handler)
 # Dashboard File Handler (Simulated stream for frontend)
 try:
     import os
+    from logging.handlers import RotatingFileHandler
     # Path relative to project root
     log_dir = os.path.join(os.getcwd(), "dashboard", "public")
     if os.path.exists(log_dir):
-        file_handler = logging.FileHandler(os.path.join(log_dir, "sniper.log"), mode='a')
+        # Rotate logs: Max 10MB, keep 5 backups
+        file_handler = RotatingFileHandler(
+            os.path.join(log_dir, "sniper.log"), 
+            mode='a', 
+            maxBytes=10*1024*1024, 
+            backupCount=5
+        )
         file_handler.setFormatter(log_formatter)
         logger.addHandler(file_handler)
 except Exception:
-    # Fail silently if dashboard dir doesn't exist
-    pass
+    # Do not crash the app if dashboard is missing, but log the warning
+    logger.warning("Failed to initialize Dashboard log handler. 'sniper.log' will not be written.", exc_info=True)
 
 class DiscoveryService:
     """Encapsulates multi-cloud target discovery."""
@@ -281,17 +296,24 @@ class CloudCullRunner:
 
 def main():
     parser = argparse.ArgumentParser(description="CloudCull: The Autonomous Multi-Cloud GPU Sniper")
-    parser.add_argument("--region", default="us-east-1", help="Cloud region to scan")
+    parser.add_argument("--region", default=settings.aws_region, help="Cloud region to scan")
     parser.add_argument("--dry-run", action="store_true", default=True, help="Simulate without action")
     parser.add_argument("--no-dry-run", action="store_false", dest="dry_run", help="Enable production kill-switch")
     parser.add_argument("--simulated", action="store_true", help="Run in mock mode without cloud credentials")
-    parser.add_argument("--model", default="claude", choices=["claude", "gemini", "llama"], help="AI Model for analysis")
+    parser.add_argument("--model", default=settings.llm_provider, choices=["anthropic", "openai", "google", "groq", "claude", "gemini", "llama"], help="AI Model for analysis")
     parser.add_argument("--active-ops", action="store_true", help="Generate and execute remediation bundle")
     parser.add_argument("--auto-approve", action="store_true", help="Bypass manual confirmation prompts (Use with CAUTION)")
     parser.add_argument("--output", help="Path to save JSON report")
     parser.add_argument("--workers", type=int, default=10, help="Parallel worker count")
     
     args = parser.parse_args()
+
+    # Start Prometheus Metrics Server
+    try:
+        start_http_server(settings.metrics_port)
+        logger.info(f"📊 Prometheus Metrics exposed at http://localhost:{settings.metrics_port}/metrics")
+    except Exception as e:
+        logger.warning(f"Failed to start Metrics Server: {e}")
 
     renderer = ConsoleRenderer()
 
@@ -346,6 +368,15 @@ def main():
                 "instances": safe_results
             }, f, indent=2)
         logger.info("JSON Report saved to %s", args.output)
+
+    # Push Final Metrics
+    z_count = sum(1 for r in results if r['status'] == "ZOMBIE")
+    # Handle unknown rates safely for the sum
+    safe_savings = sum(r['rate'] * 24 * 30 for r in results if r['status'] == "ZOMBIE" and not r.get('rate_is_unknown'))
+    
+    ZOMBIE_GAUGE.set(z_count)
+    SAVINGS_GAUGE.set(safe_savings)
+    logger.info(f"📈 Metrics Updated: {z_count} Zombies, ${safe_savings:,.2f} Savings")
 
 if __name__ == "__main__":
     main()

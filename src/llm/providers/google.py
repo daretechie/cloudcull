@@ -11,7 +11,8 @@ class GoogleProvider(BaseLLM):
     Google Implementation for Gemini 1.5/2.0 series using the modern google-genai SDK.
     """
     def __init__(self, api_key: str = None):
-        api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        from ...core.settings import settings
+        api_key = api_key or settings.google_api_key
         self.client = genai.Client(api_key=api_key)
         self.model = "gemini-2.0-flash"
 
@@ -33,7 +34,11 @@ class GoogleProvider(BaseLLM):
         }
         """
         
-        user_input = f"METADATA: {metadata}\nMETRICS: {metrics}"
+        from ..utils import sanitize_for_prompt
+        safe_metadata = sanitize_for_prompt(metadata)
+        safe_metrics = sanitize_for_prompt(metrics)
+        
+        user_input = f"METADATA: {safe_metadata}\nMETRICS: {safe_metrics}"
         
         response = self.client.models.generate_content(
             model=self.model,

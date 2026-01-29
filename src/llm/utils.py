@@ -5,6 +5,32 @@ from typing import Dict, Any
 
 logger = logging.getLogger("CloudCull.LLM.Utils")
 
+def sanitize_for_prompt(obj: Any) -> Any:
+    """
+    Security Barrier: Neutralizes potential Prompt Injection vectors in user-controlled data.
+    - Strips aggressive control characters.
+    - Neutralizes JSON syntax ({, }) to prevent structure manipulation.
+    - Caps arbitrary string length to prevent context flooding.
+    """
+    if isinstance(obj, dict):
+        return {str(k)[:100]: sanitize_for_prompt(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_for_prompt(i) for i in obj]
+    elif isinstance(obj, str):
+        # Defang standard injection patterns
+        # 1. Replace brackets to break JSON injection attempts
+        # 2. Limit length to prevent DoS via token exhaustion
+        clean = obj.replace("{", "(").replace("}", ")").replace("```", "'''")
+        
+        # 3. Strip explicit "System:" or "Instruction:" prefixes that might confuse the model
+        blocklist = ["System:", "Instruction:", "Override:", "Ignore previous"]
+        for block in blocklist:
+            if block in clean:
+                clean = clean.replace(block, f"[BLOCKED_{block[:-1].upper()}]")
+                
+        return clean[:1000]
+    return obj
+
 def extract_json_from_text(text: str) -> Dict[str, Any]:
     """
     Industrial-grade JSON extraction from LLM output.

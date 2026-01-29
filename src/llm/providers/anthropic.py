@@ -11,7 +11,8 @@ class AnthropicProvider(BaseLLM):
     Anthropic Implementation for Claude 3 series.
     """
     def __init__(self, api_key: str = None):
-        api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
+        from ...core.settings import settings
+        api_key = api_key or settings.anthropic_api_key
         self.client = Anthropic(api_key=api_key)
         self.model = "claude-3-5-sonnet-20241022" 
 
@@ -32,17 +33,9 @@ class AnthropicProvider(BaseLLM):
         """
         
         # Prompt Injection Protection: Sanitize metadata keys and values
-        def sanitize(obj):
-            if isinstance(obj, dict):
-                return {str(k)[:100]: sanitize(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [sanitize(i) for i in obj]
-            elif isinstance(obj, str):
-                return obj[:1000].replace("{", "[").replace("}", "]") # Neutralize potential JSON injection
-            return obj
-
-        safe_metadata = sanitize(metadata)
-        safe_metrics = sanitize(metrics)
+        from ..utils import sanitize_for_prompt
+        safe_metadata = sanitize_for_prompt(metadata)
+        safe_metrics = sanitize_for_prompt(metrics)
         
         user_input = f"METADATA: {safe_metadata}\nMETRICS: {safe_metrics}"
         

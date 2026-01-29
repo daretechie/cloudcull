@@ -12,4 +12,4 @@ reports
 .env
 node_modules
 dist
-uv.lock
+

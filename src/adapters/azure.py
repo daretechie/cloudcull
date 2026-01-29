@@ -13,7 +13,8 @@ logger = logging.getLogger("CloudCull.Azure")
 class AzureAdapter(AbstractAdapter):
     def __init__(self, subscription_id: str = None, simulated: bool = False):
         self.simulated = simulated
-        self.subscription_id = subscription_id or os.getenv("AZURE_SUBSCRIPTION_ID")
+        from ..core.settings import settings
+        self.subscription_id = subscription_id or settings.azure_subscription_id
         self.gpu_vms = ["NC", "ND", "NV"]
         
         if not self.simulated:
@@ -24,9 +25,10 @@ class AzureAdapter(AbstractAdapter):
                 self.monitor_client = MonitorManagementClient(self.credential, self.subscription_id)
             except AzureError as e:
                 logger.error("Azure Service Error: %s. Check subscription/permissions.", e)
+                # Keep credential as None to signal failure to preflight check
                 self.credential = None
             except Exception as e:
-                logger.error("Azure Authentication Failed: %s.", e)
+                logger.error("Azure Authentication Failed: %s.", e, exc_info=True)
                 self.credential = None
 
     def get_metrics(self, instance_id: str, **kwargs) -> Dict[str, float]:

@@ -11,7 +11,8 @@ class GroqProvider(BaseLLM):
     Groq Implementation for Llama 3 series.
     """
     def __init__(self, api_key: str = None):
-        api_key = api_key or os.getenv("GROQ_API_KEY")
+        from ...core.settings import settings
+        api_key = api_key or settings.groq_api_key
         self.client = Groq(api_key=api_key)
         self.model = "llama-3.3-70b-versatile"
 
@@ -25,7 +26,11 @@ class GroqProvider(BaseLLM):
         - ACTIVE means it is performing useful work.
         """
         
-        user_msg = f"METADATA: {metadata}\nMETRICS: {metrics}"
+        from ..utils import sanitize_for_prompt
+        safe_metadata = sanitize_for_prompt(metadata)
+        safe_metrics = sanitize_for_prompt(metrics)
+        
+        user_msg = f"METADATA: {safe_metadata}\nMETRICS: {safe_metrics}"
         
         response = self.client.chat.completions.create(
             model=self.model,

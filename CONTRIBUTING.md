@@ -15,7 +15,11 @@ We follow a strict Test-Driven Development workflow. **No code is pushed without
 uv run pytest
 
 # Run specific suite
+# Run specific suite
 uv run pytest tests/unit/adapters/test_aws.py
+
+# Run E2E Tests (Requires running dashboard)
+uv run pytest -m e2e
 ```
 
 ## Extending CloudCull

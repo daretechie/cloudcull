@@ -1,7 +1,7 @@
 # CloudCull Setup Guide
 
 ## Prerequisites
-- Python 3.14+
+- Python 3.12+
 - Node.js 20+ (for dashboard)
 - `uv` package manager (recommended)
 

@@ -57,9 +57,23 @@ class TerraformRemediator:
         """
         import subprocess
         import re
+        import os
+        import shutil
 
         logger.info("🛡️ Executing ActiveOps Remediation via Secure Subprocess...")
         
+        # 0. Safety: Backup Terraform State if it exists
+        state_file = "terraform.tfstate"
+        if os.path.exists(state_file):
+            backup_file = f"{state_file}.backup.{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+            try:
+                shutil.copy2(state_file, backup_file)
+                logger.info(f"💾 Safety Backup Created: {backup_file}")
+            except Exception as e:
+                logger.error(f"⚠️ Failed to create safety backup: {e}. Proceeding with caution.")
+        else:
+            logger.info("ℹ️ No local terraform.tfstate found. Skipping backup.")
+
         # Validation Pattern for Instance IDs (Alphanumeric + dashes only)
         # Prevents any weird characters from slipping into the command even with shell=False
         SAFE_ID_PATTERN = re.compile(r"^[a-zA-Z0-9\-]+$")
@@ -73,14 +87,14 @@ class TerraformRemediator:
             
             # 1. Strict Input Validation
             if not SAFE_ID_PATTERN.match(resource_id):
-                logger.error(f"❌ SECURITY ALERT: Invalid Resource ID '{resource_id}' detected. Skipping.")
+                logger.error("❌ SECURITY ALERT: Invalid Resource ID '%s' detected. Skipping.", resource_id)
                 fail_count += 1
                 continue
 
             # 2. Construct Command as List (No Shell Interpolation)
             resource_type = self.RESOURCE_MAPPING.get(platform)
             if not resource_type:
-                logger.warning(f"Unknown platform {platform} for resource {resource_id}. Skipping.")
+                logger.warning("Unknown platform %s for resource %s. Skipping.", platform, resource_id)
                 fail_count += 1
                 continue
 
@@ -89,18 +103,18 @@ class TerraformRemediator:
             cmd = ["terraform", "state", "rm", target_address]
 
             try:
-                logger.info(f"⚡ Sniping {target_address}...")
+                logger.info("⚡ Sniping %s...", target_address)
                 # shell=False is default, but explicit is better than implicit security
                 subprocess.run(cmd, check=True, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 success_count += 1
             except subprocess.CalledProcessError as e:
-                logger.error(f"❌ Terraform Execution Failed for {resource_id}: {e.stderr.decode().strip()}")
+                logger.error("❌ Terraform Execution Failed for %s: %s", resource_id, e.stderr.decode().strip())
                 fail_count += 1
             except FileNotFoundError:
                 logger.critical("❌ Terraform binary not found! Ensuring 'terraform' is in PATH.")
                 return
 
-        logger.info(f"✅ ActiveOps Complete. Success: {success_count}, Failed: {fail_count}")
+        logger.info("✅ ActiveOps Complete. Success: %d, Failed: %d", success_count, fail_count)
 
     def check_terraform_binary(self) -> bool:
         """Active validation of the environment for the Service Provider tool."""
