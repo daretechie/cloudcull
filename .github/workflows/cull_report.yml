@@ -45,7 +45,7 @@ jobs:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
-          uv run python main.py --simulated --dry-run --output dashboard/public/report.json
+          uv run python src/main.py --simulated --dry-run --output dashboard/public/report.json
           
       - name: Setup Node and Cache
         uses: actions/setup-node@v4
