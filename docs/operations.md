@@ -26,23 +26,27 @@ To run a real multi-cloud audit, add these to **Settings > Secrets and variables
 
 ### S3: Dashboard Remediation Workflow
 The "Sniper Console" allows for precision manual remediation:
-1.  **Analyze**: Review the "Sniper Reasoning" on each card to understand the AI's decision.
-2.  **Verify**: Check the metrics (CPU/Network) and owner attribution.
-3.  **Snip**: Click the "Copy Kill Command" icon. This copies the exact `terraform state rm` or CLI command for that specific instance.
-4.  **Execute**: Paste the command into your terminal to safely remove the resource from your state and infrastructure.
+1.  **Start the Dashboard**: 
+    - Build: `cd dashboard && npm run build`
+    - Start: `python3 src/dashboard_server.py` (Securely serves at `http://localhost:8080`)
+2.  **Analyze**: Review the "Sniper Reasoning" on each card to understand the AI's decision.
+3.  **Verify**: Check the metrics (CPU/Network) and owner attribution.
+4.  **Snip**: Click the "Copy Kill Command" icon. This copies the exact `terraform state rm` or CLI command for that specific instance.
+5.  **Execute**: Paste the command into your terminal to safely remove the resource from your state and infrastructure.
 
 ### S4: ActiveOps (Automated Remediation)
 For high-speed, autonomous governance:
 1.  **Analyze**: Run `uv run python main.py --active-ops`.
 2.  **Verify**: CloudCull will directly execute remediation steps via secure `subprocess` and generate `remediation_manifest.json`.
 3.  **Approve**: The CLI will prompt for a final confirmation before executing the remediation actions (Physical Stop + State RM).
-4.  **Safety**: Before any destructive state removal, CloudCull automatically creates a backup: `terraform.tfstate.backup.<timestamp>`.
+4.  **Safety**: Before any destructive state removal, CloudCull automatically creates a backup in the `backups/` directory.
 5.  **Audit**: Review the `remediation_manifest.json` for a post-mortem of all actions taken.
 
-### S5: Monitoring Platform Health (Prometheus)
-CloudCull exposes real-time metrics for integration with Grafana or Datadog:
-1.  **Endpoint**: `http://localhost:8000/metrics` (configurable via `METRICS_PORT`).
-2.  **Key Gauges**:
+### S5: Monitoring Platform Health
+CloudCull exposes real-time metrics and a secure UI:
+1.  **Metrics (Prometheus)**: `http://localhost:8000/metrics` (configurable via `METRICS_PORT`).
+2.  **Dashboard (Secure UI)**: `http://localhost:8080` (requires `python3 src/dashboard_server.py`).
+3.  **Key Gauges**:
     - `cloudcull_zombies_found_total`: Current count of identified waste.
     - `cloudcull_potential_savings_usd`: Projected monthly savings from pending remediation.
 
