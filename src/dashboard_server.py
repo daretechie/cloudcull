@@ -6,7 +6,7 @@ import logging
 from urllib.parse import urlparse
 
 # Configuration
-PORT = 8000
+PORT = 8080
 WEB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "dashboard/dist")
 LOG_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs/sniper.log")
 REPORT_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "report.json")
