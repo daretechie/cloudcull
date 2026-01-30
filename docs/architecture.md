@@ -29,11 +29,18 @@ graph TD
     
     subgraph "Layer 4: Visibility (Sniper Console)"
         Orchestrator -->|Output| Report[report.json]
-        Report -->|Serve| Srv[Secure Server (Python)]
-        Srv -->|API| Vite[Vite + React Dashboard]
-        Vite -->|Feature| AI[AI Reasoning Callouts]
-        Vite -->|Feature| Log[Secure Terminal Stream]
-        Vite -->|Feature| Snip[One-Tap Kill Actions]
+        Orchestrator -->|Secure Logs| LogFile[logs/sniper.log]
+        
+        subgraph "Local Secure Mode"
+            Server[Secure Dashboard Server (Python)]
+            Server -->|API: /api/logs| LogFile
+            Server -->|API: /api/report| Report
+            Server -->|Serves| Vite[React Dashboard]
+        end
+        
+        subgraph "Cloud Mode (Audit Only)"
+            Report -->|Deploy| Pages[GitHub Pages]
+        end
     end
 ```
 
@@ -41,25 +48,35 @@ graph TD
 
 ### 1. Multi-Cloud Adapters (`adapters/`)
 - **Design Principle**: "Unified Interface". All adapters inherit from `AbstractAdapter`.
-- **Scalability**: AWS adapter implements **Paginators** for accounts with >50 instances.
-- **Precision**: GCP adapter implements real-time **Identity Attribution** via Cloud Audit Logs.
+- **Resilience**: Hardened with specific SDK exception handling (ClientError, AzureError, etc.) to improve diagnostic observability.
+- **Efficiency**: Implements target batching to solve N+1 discovery bottlenecks.
 
 ### 2. The AI Brain (`llm/`)
 - **Strategy Pattern**: `LLMFactory` allows hot-swapping between `AnthropicProvider`, `GoogleProvider`, etc.
-- **Robustness**: Uses advanced JSON extraction heuristics to handle markdown-wrapped or chatty responses.
-- **Parallelization**: Parallel classification achieving O(1) analysis time.
+- **Robustness**: Uses advanced JSON extraction heuristics to handle markdown-wrapped or chatty responses. Survives non-JSON snippets.
+- **Parallelization**: The `CloudCullRunner` utilizes a `ThreadPoolExecutor` to classify multiple instances concurrently, achieving O(1) analysis time relative to target count.
 
 ### 3. Fail-Fast Reliability (Pre-flight)
-- **Preflight Checks**: Verifies LLM connectivity and active cloud credentials before launch.
+- **Preflight Checks**: Before scanning, the orchestrator verifies LLM connectivity and cloud adapter initialization to prevent late-stage pipeline failures.
 
-### 4. Remediation Engine
-- **Philosophy**: "GitOps First". We generate sanitized `terraform state rm` commands.
-- **Integrity**: Implements **State Lookup**—dynamically finding the correct resource address in `.tfstate` to prevent "blind" deletion failures.
-- **Safety**: Automated state backups before destructive actions.
+### 4. Identity Attribution (Shame-Ops)
+- **AWS**: Queries `CloudTrail` for `RunInstances` events.
+- **Azure**: Queries `Activity Logs` for write operations.
+- **GCP**: Queries `Cloud Audit Logs` for insert operations.
+- **Why?**: Knowing *who* launched a zombie instance is critical for visibility and cost attribution.
 
-### 5. Secure Visibility
-- **Secure Server**: `src/dashboard_server.py` serves the dashboard via a hardened Python backend.
-- **API Guard**: Replaces insecure direct file access with specific API endpoints (`/api/logs`, `/api/report`) that enforce path-safe binary reads.
+### 5. Remediation Engine
+- **Philosophy**: "GitOps First". We generate sanitized `terraform state rm` commands to reconcile infrastructure state.
+- **Safety**: Automatically creates a timestamped backup of `terraform.tfstate` before any state-modification command is executed.
+- **Security**: All shell inputs (IDs, Platforms, Owners) are sanitized using `shlex.quote` and validated against alphanumeric safe-patterns.
+- **ActiveOps Artifacts**:
+    - `remediation_manifest.json`: A structured manifest for CI/CD integration and auditing.
+- **Security**: All actions are executed via secure `subprocess.run` with `shell=False`.
+- **Kill-Switch**: A `--active-ops` flag conducts both physical stops and state removals.
+
+### 6. Observability & Health
+- **Prometheus Integration**: Exposes platform-level metrics (zombies found, savings potential) on `/metrics`.
+- **Log Rotation**: Uses `RotatingFileHandler` to prevent log exhaustion on long-running worker nodes.
 
 # Design Principles: The "Sniper" Philosophy
 
@@ -93,4 +110,7 @@ CloudCull is built on specific architectural decisions that differentiate it fro
 ## 6. Visibility as a Catalyst for Action
 **Rationale:** Dashboards that only show "Potential Savings" often lead to analysis paralysis.
 *   **The Sniper Console:** We transform the dashboard into a "Sniper Console" by providing **AI Reasoning Callouts** and **One-Tap Snip** controls. 
+*   **Secure Delivery:** Visibility is provided through two modes:
+    *   **Secure Local Mode:** A dedicated Python server (`dashboard_server.py`) that proxies logs and reports via an API layer to prevent raw file exposure.
+    - **Static Cloud Mode:** Deploys a read-only audit report to GitHub Pages for organizational visibility.
 *   **Result:** By showing exactly *why* an instance is a zombie and providing the *exact command* to kill it, we remove the friction between detection and remediation.

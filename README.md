@@ -12,9 +12,11 @@
 
 > 🔴 **[VIEW LIVE DEMO DASHBOARD](https://daretechie.github.io/cloudcull/)**
 
+![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)
 ![AWS FinOps](https://img.shields.io/badge/AWS-FinOps-orange.svg)
 ![GCP FinOps](https://img.shields.io/badge/GCP-FinOps-blue.svg)
-![Python 3.14](https://img.shields.io/badge/Python-3.14-green.svg)
+![Azure FinOps](https://img.shields.io/badge/Azure-FinOps-blue.svg)
+
 ---
 
 ### 💰 The 2026 Problem: "GPU Bankruptcy"
@@ -33,25 +35,24 @@ CloudCull follows a robust, CLI-first automation flow designed for deep integrat
 graph LR
     Trigger["Cron / GitHub Action"] --> Probe["Probe: Multi-Cloud SDKs"]
     Probe --> Analyzer["Analyzer: Multi-Model AI"]
-    Analyzer -- "ZOMBIE" --> Stop["Stop: Cloud Native API"]
+    Analyzer -- "Decision: Zombie Identified" --> UI["UI: Approval Notification"]
+    UI -- "Approve" --> Stop["Stop: Cloud Native API"]
     Stop --> StateRM["State RM: Terraform"]
-    StateRM --> Srv["Secure Dashboard Server"]
-    Srv --> Console["Sniper Console (React)"]
 ```
 
 ## 🏗️ Key Features
 
-*   **🛡️ High-Fidelity Brain:** Pluggable AI (Claude 3.5, Gemini 1.5, Llama 3) for intelligent classification.
-*   **📡 Sniper Console:** A technical Vite + React dashboard with **AI Reasoning Callouts**, **Secure Terminal Streams**, and **One-Tap Kill Actions**.
+*   **� High-Fidelity Brain:** Pluggable AI (Claude 3.5, Gemini 1.5, Llama 3) for intelligent classification.
+*   **📡 Sniper Console:** A technical Vite + React dashboard with **AI Reasoning Callouts**, **Live Terminal Logs**, and **One-Tap Kill Actions**.
 *   **👤 Identity Layer:** Finds exactly who launched the instance for high-stakes accountability.
-*   **🛠️ IaC-Driven Remediation:** Generates `terraform state rm` plans with **Smart State Lookup** to prevent drift and corruption.
+*   **🛠️ IaC-Driven Remediation:** Generates `terraform state rm` plans instead of raw, risky deletions.
 
 ---
 
 ## 🛠️ Usage
 
 > [!NOTE]
-> **CloudCull is a CLI-First Tool.** The dashboard is a visualization layer served via a secure Python backend.
+> **CloudCull is a CLI-First Tool.** The dashboard is a passive visualization layer.
 
 ### 1. Installation (via uv)
 ```bash
@@ -80,30 +81,19 @@ uv run cloudcull --region us-east-1 --active-ops
 > [!CAUTION]
 > `--active-ops` will perform cloud-native stop actions and generate `config/remediation_manifest.json`. Use with high-stakes environments after dry-run verification.
 
-### 4. Viewing the Dashboard (Secure Mode)
-```bash
-# Build frontend
-cd dashboard && npm run build && cd ..
-# Start secure server
-python3 src/dashboard_server.py
-```
-Access at `http://localhost:8080`.
-
 ---
 
 ## 📂 Repository Orientation
 
 | Directory | Purpose |
 | :--- | :--- |
-| `src/` | **Source Code.** All Python modules, adapters, and `dashboard_server.py`. |
-| `infra/` | **Infrastructure.** Dockerfile and deployment resources. |
-| `config/` | **Configuration.** Dynamic manifests (e.g., remediation plans). |
+| `src/` | **Source Code.** All Python modules, adapters, and the main entrypoint. |
+| `infra/` | **Infrastructure.** Dockerfile, Docker Compose, and future IaC (Terraform). |
+| `config/` | **Configuration.** Static and dynamic manifests (e.g., remediation plans). |
 | `scripts/` | **Tooling.** Utility scripts and demonstration walkers. |
 | `docs/` | **Documentation.** Architecture, Operations, and Security guides. |
 | `tests/` | **Validation.** Unit and integration test suites. |
-| `logs/` | **Secure Logs.** Operation logs (excluded from public paths). |
-| `backups/` | **IaC Backups.** Timestamped `terraform.tfstate` backups. |
-| `dashboard/` | **Visualization.** React + Vite frontend source code. |
+| `dashboard/` | **Visualization.** React + Vite frontend for Passive Monitoring. |
 
 ---
 

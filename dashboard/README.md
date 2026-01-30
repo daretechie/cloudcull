@@ -8,33 +8,41 @@ The **CloudCull Dashboard** is a high-fidelity React application designed to vis
 *   **"Kill List" Visualization:** Instantly see which instances are marked as `ZOMBIE`.
 *   **Financial Impact:** Real-time calculation of potential monthly savings.
 *   **Identity Shaming:** Highlights the specific users (`@john.doe`) responsible for waste.
-*   **Secure Log Streaming:** Built-in terminal stream to view audit logs without exposing them to the public internet (requires secure backend).
+*   **Secure API Integration:** Consumes logs and reports via the `dashboard_server.py` API to ensure metadata protection and live terminal updates. 
+*   **Dual-Mode Hosting:** Supports high-stakes local governance (Secure) or read-only public auditing (Static).
 
 ## 🛠️ Tech Stack
-*   **Vite + React:** Modern frontend.
-*   **Python (stdlib):** Secure backend server for logs/reporting.
+*   **Vite:** Ultra-fast build tool.
+*   **React:** Component-based UI.
+*   **CSS Modules:** Scoped styling for a "Dark Mode" cyber-security aesthetic.
 
 ## 🚀 Setup & Build
 
-### 1. Build Frontend
+### 1. Install Dependencies
 ```bash
-npm run build
+npm install
 ```
 
-### 2. Run Locally (Secure Mode)
+### 2. Run Locally (Secure)
+To view live logs and real audit data, use the secure backend:
 ```bash
-# From project root
 python3 src/dashboard_server.py
 ```
 Navigate to `http://localhost:8080`.
 
-### 3. Legacy Dev Mode
+### 3. Dev Mode (Frontend Only)
 ```bash
 npm run dev
 ```
-Navigate to `http://localhost:5173`. *Note: Logs will not be available in this mode.*
+Navigate to `http://localhost:5173`. *Note: Secured logs will not be visible in this mode.*
+
+### 3. Build for Production
+```bash
+npm run build
+```
+This generates static assets in `dist/` that can be deployed to any static host (GitHub Pages, Netlify, S3).
 
 ## 🔄 Integration Flow
-1.  **Core Engine** runs `main.py` and outputs `report.json` and `logs/sniper.log`.
-2.  **Secure Server** (`dashboard_server.py`) serves the `dist/` folder and proxies data from the local filesystem via secure APIs.
-3.  **Client** renders the state and streams logs from `/api/logs`.
+1.  **Core Engine** runs `main.py` and outputs `report.json`.
+2.  **GitHub Action** saves this JSON artifact.
+3.  **Deploy Job** copies the `dist/` folder and the new `report.json` to the `gh-pages` branch.

@@ -66,7 +66,7 @@ The dashboard is served via a secure Python backend to protect sensitive logs.
     ```bash
     python3 src/dashboard_server.py
     ```
-    Access at `http://localhost:8000`.
+    Access at `http://localhost:8080`.
 
 ### Legacy Dev Mode
 *Note: Will not be able to access secured logs.*
