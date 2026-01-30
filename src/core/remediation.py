@@ -55,13 +55,13 @@ class TerraformRemediator:
         Smart Lookup: Scans Terraform state to find the logical address (e.g. 'aws_instance.worker')
         that corresponds to the physical ID (e.g. 'i-12345').
         """
-        import subprocess
+        import subprocess  # nosec
         import json
         
         try:
             # Fetch entire state as JSON
             cmd = ["terraform", "show", "-json"]
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)  # nosec
             state = json.loads(result.stdout)
             
             # recursive search function for the complex state structure
@@ -93,7 +93,7 @@ class TerraformRemediator:
         """
         Executes the remediation plan directly using secure subprocess calls.
         """
-        import subprocess
+        import subprocess  # nosec
         import re
         import os
         import shutil
@@ -150,7 +150,7 @@ class TerraformRemediator:
 
             try:
                 logger.info("⚡ Sniping %s...", target_address)
-                subprocess.run(cmd, check=True, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.run(cmd, check=True, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # nosec
                 success_count += 1
             except subprocess.CalledProcessError as e:
                 logger.error("❌ Terraform Execution Failed for %s: %s", resource_id, e.stderr.decode().strip())

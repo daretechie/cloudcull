@@ -26,6 +26,7 @@ jobs:
 
       - name: Security Scan (Bandit & pip-audit)
         run: |
+          uv sync --group dev
           uv run bandit -c pyproject.toml -r . -ll -ii
           uv run pip-audit
 
