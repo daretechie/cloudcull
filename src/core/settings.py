@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 from typing import Literal
 
@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     Centralized Configuration for CloudCull.
     Reads from environment variables (case-insensitive) and .env file.
     """
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8')
+
     # General
     log_level: Literal['DEBUG', 'INFO', 'WARNING', 'ERROR'] = Field('INFO', alias='LOG_LEVEL')
     environment: Literal['development', 'production'] = Field('development', alias='cull_env')
@@ -26,9 +28,5 @@ class Settings(BaseSettings):
     # Dashboard
     dashboard_port: int = Field(5173, alias='DASHBOARD_PORT')
     metrics_port: int = Field(8000, alias='METRICS_PORT')
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = 'utf-8'
 
 settings = Settings()

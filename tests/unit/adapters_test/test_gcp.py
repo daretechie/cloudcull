@@ -1,4 +1,3 @@
-import sys
 from unittest.mock import MagicMock, patch
 from src.adapters.gcp import GCPAdapter
 
@@ -13,8 +12,7 @@ def test_gcp_scan_with_mocks(mock_monitor_class, mock_compute_class):
     mock_logging_mod = MagicMock()
     with patch.dict("sys.modules", {"google.cloud.logging_v2": mock_logging_mod}):
          # Configure the class on the module mock
-         mock_logging_class = mock_logging_mod.LoggingServiceV2Client
-         mock_logging = mock_logging_class.return_value
+         _ = mock_logging_mod.LoggingServiceV2Client
          
          adapter = GCPAdapter(project_id="test-project")
     

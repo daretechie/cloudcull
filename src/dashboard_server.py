@@ -74,7 +74,7 @@ if __name__ == "__main__":
             f.write("<h1>Dashboard not built. Run 'npm run build' in dashboard/ directory.</h1>")
 
     logger.info(f"Serving Secure Dashboard at http://localhost:{PORT}")
-    logger.info(f"API Endpoints: /api/logs, /api/report")
+    logger.info("API Endpoints: /api/logs, /api/report")
     
     with socketserver.TCPServer(("", PORT), SecureDashboardHandler) as httpd:
         try:

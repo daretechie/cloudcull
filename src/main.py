@@ -1,27 +1,24 @@
 #!/usr/bin/env python3
-import logging
 import argparse
-import json
 import datetime
-import sys
-from typing import List, Dict
-
-# Modular Imports
+import json
+import logging
 import os
+import sys
 from logging.handlers import RotatingFileHandler
+from typing import Dict, List
 
-# Constants
-HOURS_PER_MONTH = 730  # Standardized average hours per month
+from prometheus_client import Gauge, start_http_server
 
 # Modular Imports
 from .adapters import AdapterRegistry
 from .core.pricing import CloudPricing
-from .llm.factory import LLMFactory
 from .core.remediation import TerraformRemediator
 from .core.settings import settings
+from .llm.factory import LLMFactory
 
-# Observability Imports
-from prometheus_client import start_http_server, Gauge
+# Constants
+HOURS_PER_MONTH = 730  # Standardized average hours per month
 
 # Define Metrics
 ZOMBIE_GAUGE = Gauge('cloudcull_zombies_found_total', 'Total number of zombie instances detected')

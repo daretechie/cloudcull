@@ -1,4 +1,3 @@
-import pytest
 from src.main import scrub_metadata
 
 def test_scrub_metadata_basic():

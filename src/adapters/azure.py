@@ -1,6 +1,5 @@
 import logging
 import datetime
-import os
 from typing import List, Dict, Any
 from azure.identity import DefaultAzureCredential
 from azure.mgmt.compute import ComputeManagementClient

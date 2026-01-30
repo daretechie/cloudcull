@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch
-from src.main import CloudCullRunner, DiscoveryService
+from src.main import CloudCullRunner
 
 @pytest.fixture
 def mock_context():

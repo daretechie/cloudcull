@@ -1,6 +1,5 @@
 import logging
 import datetime
-import os
 from typing import List, Dict, Any
 from google.cloud import compute_v1
 from google.cloud import monitoring_v3
@@ -33,7 +32,6 @@ class GCPAdapter(AbstractAdapter):
 
     def get_metrics(self, instance_id: str, **kwargs) -> Dict[str, float]:
         """Real GCP Cloud Monitoring metric probing."""
-        zone = kwargs.get('zone')
         try:
             now = datetime.datetime.now(datetime.UTC)
             seconds = int(now.timestamp())
