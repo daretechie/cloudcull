@@ -41,3 +41,6 @@ filterwarnings = [
 markers = [
     "e2e: End-to-End tests requiring running dashboard",
 ]
+
+[tool.bandit]
+exclude_dirs = [".venv", "tests", "infra", "docs", "dashboard"]
