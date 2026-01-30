@@ -26,7 +26,7 @@ jobs:
 
       - name: Security Scan (Bandit & pip-audit)
         run: |
-          uv run bandit -r . -ll -ii
+          uv run bandit -c pyproject.toml -r . -ll -ii
           uv run pip-audit
 
       - name: Run CloudCull Audit
