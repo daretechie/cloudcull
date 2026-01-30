@@ -137,5 +137,13 @@ To enable the live dashboard, you **must** manually activate GitHub Pages in you
 *   [Dashboard Guide](dashboard/README.md)
 *   [Operations Guide](docs/operations.md)
 
+## 🔐 Security Checks
+
+To run security audits against the codebase (excluding virtual environments):
+
+```bash
+uv run bandit -c pyproject.toml -r .
+```
+
 ## 📄 License
 This project is licensed under the MIT License.
