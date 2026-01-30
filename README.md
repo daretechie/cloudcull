@@ -8,7 +8,7 @@
 [![CloudCull Autonomous Audit](https://github.com/daretechie/cloudcull/actions/workflows/cull_report.yml/badge.svg)](https://github.com/daretechie/cloudcull/actions/workflows/cull_report.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**CloudCull** is an "Investor-Grade" autonomous governance framework designed to detect and eliminate GPU waste across AWS, Azure, and Google Cloud Platform. By 2026, it is the standard for multi-cloud cost optimization.
+**CloudCull** is an "Investor-Grade" autonomous governance framework designed to detect and eliminate GPU waste across **AWS**, **Azure**, and **Google Cloud Platform**. By 2026, it is the standard for multi-cloud cost optimization.
 
 > 🔴 **[VIEW LIVE DEMO DASHBOARD](https://daretechie.github.io/cloudcull/)**
 
@@ -75,13 +75,24 @@ This script simulates a multi-cloud audit and remediation flow with high-fidelit
 ### 3. Execution (ActiveOps)
 To run a real-world audit and trigger the automated remediation bundle:
 ```bash
-uv run cloudcull --region us-east-1 --active-ops
+uv run cloudcull --region us-east-1 --active-ops # AWS
+uv run cloudcull --platform azure --active-ops # Azure
+uv run cloudcull --platform gcp --active-ops   # GCP
 ```
 
 > [!CAUTION]
 > `--active-ops` will perform cloud-native stop actions and generate `config/remediation_manifest.json`. Use with high-stakes environments after dry-run verification.
 
 ---
+
+## 💼 Commercial Support & Audits
+Don't have time to run the Sniper yourself? I provide professional, fixed-price audits and CI/CD integration services.
+
+[![Hire on Upwork](https://img.shields.io/badge/Upwork-Hire_Me-6fda44?style=for-the-badge&logo=upwork)](https://www.upwork.com/services/product/development-it-comprehensive-multi-cloud-gpu-waste-audit-cost-optimization-report-2017073724347350169)
+
+- **One-Time Audit:** Rapid detection of multi-cloud waste.
+- **Governance Setup:** Deliverable Remediation manifests and fixes.
+- **Continuous Ops:** Full CI/CD integration for automated cost control.
 
 ## 📂 Repository Orientation
 

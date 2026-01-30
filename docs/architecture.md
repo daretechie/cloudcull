@@ -61,8 +61,8 @@ graph TD
 
 ### 4. Identity Attribution (Shame-Ops)
 - **AWS**: Queries `CloudTrail` for `RunInstances` events.
-- **Azure**: Queries `Activity Logs` for write operations.
-- **GCP**: Queries `Cloud Audit Logs` for insert operations.
+- **Azure**: Queries `Activity Logs` for `write` operations.
+- **GCP**: Queries `Cloud Audit Logs` for `insert` operations.
 - **Why?**: Knowing *who* launched a zombie instance is critical for visibility and cost attribution.
 
 ### 5. Remediation Engine

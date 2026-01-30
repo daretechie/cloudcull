@@ -50,10 +50,10 @@ echo ""
 # --- Phase 1: High-Fidelity Discovery & Analysis ---
 echo "${BOLD}[PHASE 1] Scanning for Multi-Cloud GPU Waste (Simulated)${RESET}"
 echo "-------------------------------------------------------------------------------"
-echo "${CYAN}Executing: $PYTHON_CMD -m src.main --simulated --model gemini --output demo_report.json${RESET}"
+echo "${CYAN}Executing: $PYTHON_CMD -m src.main --simulated --model ${LLM_PROVIDER:-anthropic} --output demo_report.json${RESET}"
 echo ""
 
-$PYTHON_CMD -m src.main --simulated --model gemini --output demo_report.json
+$PYTHON_CMD -m src.main --simulated --model ${LLM_PROVIDER:-anthropic} --output demo_report.json
 
 echo ""
 echo "${BOLD}[PHASE 2] Intelligence Review${RESET}"

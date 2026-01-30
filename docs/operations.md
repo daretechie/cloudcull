@@ -66,6 +66,6 @@ Since logs are now stored in `logs/sniper.log` (secured), they are not accessibl
 
 ## Security
 - **Least Privilege**: The runner only needs `ReadOnly` access for `scan()`.
-- **Write Access**: `stop_instance()` requires `ec2:StopInstances` (AWS), `compute.instances.stop` (GCP), etc.
+- **Write Access**: `stop_instance()` requires `ec2:StopInstances` (AWS), `Microsoft.Compute/virtualMachines/deallocate/action` (Azure), `compute.instances.stop` (GCP), etc.
 - **Log Isolation**: Logs are kept in a separate directory (`logs/`) and served via an API layer to prevent accidental exposure of sensitive metadata that may be present in debug logs.
 - **IaC Integrity**: Remediation actions are dynamically looked up in the Terraform state to prevent state corruption.
