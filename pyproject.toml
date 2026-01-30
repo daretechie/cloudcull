@@ -28,6 +28,7 @@ cloudcull = "src.main:main"
 [dependency-groups]
 dev = [
     "bandit>=1.9.3",
+    "pip-audit>=2.7.3",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
     "pytest-mock>=3.15.1",
