@@ -49,7 +49,7 @@ try:
     )
     file_handler.setFormatter(log_formatter)
     logger.addHandler(file_handler)
-except Exception as e:
+except OSError as e:
     logger.warning("Failed to initialize secure log handler: %s", e)
 
 class DiscoveryService:
@@ -314,9 +314,9 @@ def main():
     # Start Prometheus Metrics Server
     try:
         start_http_server(settings.metrics_port)
-        logger.info(f"📊 Prometheus Metrics exposed at http://localhost:{settings.metrics_port}/metrics")
-    except Exception as e:
-        logger.warning(f"Failed to start Metrics Server: {e}")
+        logger.info("📊 Prometheus Metrics exposed at http://localhost:%s/metrics", settings.metrics_port)
+    except OSError as e:
+        logger.warning("Failed to start Metrics Server: %s", e)
 
     renderer = ConsoleRenderer()
 
@@ -379,7 +379,7 @@ def main():
     
     ZOMBIE_GAUGE.set(z_count)
     SAVINGS_GAUGE.set(safe_savings)
-    logger.info(f"📈 Metrics Updated: {z_count} Zombies, ${safe_savings:,.2f} Savings")
+    logger.info("📈 Metrics Updated: %d Zombies, $%s Savings", z_count, f"{safe_savings:,.2f}")
 
 if __name__ == "__main__":
     main()

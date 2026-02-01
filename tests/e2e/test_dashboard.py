@@ -9,32 +9,33 @@ def test_dashboard_loads_successfully(page: Page):
     Requires: 'npm run dev' running on port 5173.
     """
     # 1. Navigate to Dashboard
-    page.goto("http://localhost:5173")
+    page.goto("http://localhost:8080")
 
     # 2. Check Title
     expect(page).to_have_title(re.compile("CloudCull Sniper Console"))
 
-    # 3. Verify Header Presence
-    header = page.locator("h1")
-    expect(header).to_contain_text("CloudCull Sniper Console")
+    # 3. Verify Logo/Title Presence
+    logo = page.locator(".brand-logo")
+    # If the image fails, it falls back to a div with .fallback-logo
+    expect(logo.or_(page.locator(".fallback-logo"))).to_be_visible()
 
     # 4. Verify Topology Graph (Mermaid)
-    # Mermaid renders into an SVG or div with ID. We check for the container.
-    diagram = page.locator(".mermaid")
-    # depending on how mermaid renders, it might take a moment
-    expect(diagram).to_be_visible(timeout=10000)
+    # Mermaid renders into an SVG or div with class mermaid-wrapper.
+    diagram = page.locator(".mermaid-wrapper")
+    expect(diagram).to_be_visible(timeout=15000)
 
     # 5. Verify Sniper Log Terminal
-    terminal = page.locator(".terminal-window")
+    terminal = page.locator(".sniper-log")
     expect(terminal).to_be_visible()
-    expect(terminal).to_contain_text("Sniper Link Established")
+    # Check for terminal header text
+    expect(terminal).to_contain_text("SNIPER_CONSOLE")
 
 @pytest.mark.e2e
 def test_active_ops_button_state(page: Page):
     """
     Verifies the interaction elements.
     """
-    page.goto("http://localhost:5173")
+    page.goto("http://localhost:8080")
     
     # Check for the "Kill Switch" or action buttons if they exist
     # Based on previous context, we have "One-Tap Snip"

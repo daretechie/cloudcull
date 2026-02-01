@@ -47,7 +47,10 @@ class GCPAdapter(AbstractAdapter):
             # 1. CPU Utilization metric
             results = self.metric_client.list_time_series(
                 name=f"projects/{self.project_id}",
-                filter='metric.type="compute.googleapis.com/instance/cpu/utilization"',
+                filter=(
+                    'metric.type="compute.googleapis.com/instance/cpu/utilization" AND '
+                    f'resource.labels.instance_id="{instance_id}"'
+                ),
                 interval=interval,
                 view=monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
             )
@@ -61,7 +64,10 @@ class GCPAdapter(AbstractAdapter):
             # 2. Network Utilization
             results_net = self.metric_client.list_time_series(
                 name=f"projects/{self.project_id}",
-                filter='metric.type="compute.googleapis.com/instance/network/received_bytes_count"',
+                filter=(
+                    'metric.type="compute.googleapis.com/instance/network/received_bytes_count" AND '
+                    f'resource.labels.instance_id="{instance_id}"'
+                ),
                 interval=interval,
                 view=monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
             )
